@@ -147,6 +147,7 @@ def aplicar_carta(numero, estado):
     # Carta 25: Demanda judicial
     #   - Multas e indemnizaciones +15,000.
     elif numero == 25:
+        estado["Multas e indemnizaciones"]+=15000
         return estado
 
     # Carta 26: Nuevo competidor agresivo
@@ -154,12 +155,12 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
 
-    elif numero == 26:
+    elif numero == 26: # problema al definir ventas ya que no es una variable original
         return estado
 
     # Carta 27: Robo interno
     #   - Caja se reduce en 10,000.
-    elif numero == 27:
+    elif numero == 27: #que pasa si tienes menos
         return estado
 
     # Carta 28: Crisis economica
@@ -188,20 +189,26 @@ def aplicar_carta(numero, estado):
 
     # Carta 32: Error contable
     #   - Caja −7000.
-    elif numero == 32:
+    elif numero == 32:# problema que pasa si tienes menos de 7000
         return estado
 
     # Carta 33: Error en codigo de barras
     #   - No se venden productos este mes:
     #   - reputación baja 2 niveles
     elif numero == 33:
+        # if int(estado["Reputacion del mercado"][-1])>=2: si no puede ser negativo
+        estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
+        # elif int(estado["Reputacion del mercado"][-1])<2:
+        #estado["Reputacion del mercado"]="Nivel "+str(0)
+
         return estado
 
     # Carta 34: Mal diseño del empaque
     #   - Ventas −25%
     #   - reputación baja 2 niveles
     # Duración: 2 turnos
-    elif numero == 34:
+    elif numero == 34: # se aplicara en estado final depende del orden que se ejecute
+        estado["carta34"]==2
         return estado
 
     # Carta 35: Cliente se intoxica

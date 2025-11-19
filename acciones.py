@@ -76,6 +76,9 @@ def produccion_mantenimiento_maquinaria(estado):
     return estado
 
 def produccion_comprar_nueva_maquina(estado):
+    if estado["Caja disponible"]>10000:
+        estado["Caja disponible"]-=10000
+
     """
     5. Comprar nueva maquina:
     - Resta S/ 10 000 de “Caja disponible”.
@@ -383,6 +386,8 @@ def finanzas_pagar_proveedores(estado):
     return estado
 
 def finanzas_pagar_deuda(estado):
+    estado["Caja disponible"]>=10000
+
     """
     2. Pagar deuda:
 

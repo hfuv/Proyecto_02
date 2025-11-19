@@ -45,7 +45,7 @@ def calcular_estado_inicial():
         "duracion_ecommerce": 0,
         "contador_fondo_emergencia": 0,
         "Ventas": 0  # vinculado al estado final
-
+        "Registro_de_cambios":{}# usare esto de aca para revertir efectos de las acciones
     }
 
 def calcular_estado_final(estado):
@@ -157,7 +157,6 @@ def calcular_estado_final(estado):
     estado["BrandingActivo"]= False
     estado["MantenimientoHecho"]=False
     estado["EcommerceActivo"]= False
-
     """
     
     7) Actualizacion de flags temporales y decremento de contadores

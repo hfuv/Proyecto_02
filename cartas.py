@@ -1,5 +1,5 @@
 # cartas.py
-
+#es muy necesario saber el orden de ejecucion
 def aplicar_carta(numero, estado):
     # Carta 1: Dia tranquilo:
     # No ocurre nada malo.
@@ -31,7 +31,7 @@ def aplicar_carta(numero, estado):
     elif numero == 5:
         return estado
 
-    # Carta 6: Producto retirado del mercado
+    # Carta 6: Producto retirado del mercado /- no entiendo
     #   - Reputacion se reduce 2 niveles.
     #   - Tuvimos que reponer mercaderia equivalente a la demanda actual (elimina el inventario equivalente a la demanda)
     #   - Luego, la demanda actual se reduce en 50%
@@ -71,13 +71,13 @@ def aplicar_carta(numero, estado):
     elif numero == 11:
         return estado
 
-    # Carta 12: Boicot de clientes
+    # Carta 12: Boicot de clientes # reversion de acciones
     #   - Ventas de esta semana reducidas al 50%:
     # Duración: 2 turnos
     elif numero == 12:
         return estado
 
-    # Carta 13: Error de etiquetado
+    # Carta 13: Error de etiquetado // reversion de acciones
     #   - Devuelven todas las unidades vendidas el turno actual y el turno anterior
     #     • Debes devolver el dinero obtenido por dichas ventas
     #     • Además, gastas 15,000 soles en la logística inversa
@@ -105,7 +105,7 @@ def aplicar_carta(numero, estado):
     elif numero == 17:
         return estado
 
-    # Carta 18: Plaga en planta
+    # Carta 18: Plaga en planta // reversion de acciones
     #   - Produccion a la mitad este turno
     # Duración: 3 turnos
     elif numero == 18:
@@ -138,7 +138,7 @@ def aplicar_carta(numero, estado):
     elif numero == 23:
         return estado
 
-    # Carta 24: Bloqueo logistico
+    # Carta 24: Bloqueo logistico // reversion de acciones
     #   - No se venden unidades
     # Duración: 2 turnos
     elif numero == 24:
@@ -150,7 +150,7 @@ def aplicar_carta(numero, estado):
         estado["Multas e indemnizaciones"]+=15000
         return estado
 
-    # Carta 26: Nuevo competidor agresivo
+    # Carta 26: Nuevo competidor agresivo // reversion de acciones
     #   - Ventas −40%:
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
@@ -168,31 +168,31 @@ def aplicar_carta(numero, estado):
     elif numero == 28:
         return estado
 
-    # Carta 29: Fuga de datos
+    # Carta 29: Fuga de datos // reversion de acciones
     #   - Reputacion del mercado −2 nivel.
     #   - Ventas de este mes se reducen en un 75%
     elif numero == 29:
         return estado
 
-    # Carta 30: Huelga nacional
+    # Carta 30: Huelga nacional // reversion de acciones
     #   - No ventas ni produccion
     #   - Debemos pagar 10,000 por almacén
     # Duración: 3 turnos
     elif numero == 30:
         return estado
 
-    # Carta 31: Rechazo de exportacion
+    # Carta 31: Rechazo de exportacion // reversion de acciones
     #   - Inventario acumulado (no se vende este mes).
     #   - Debemos pagar 10,000 por almacén
     elif numero == 31:
         return estado
 
-    # Carta 32: Error contable
+    # Carta 32: Error contable # reversion de acciones
     #   - Caja −7000.
     elif numero == 32:# problema que pasa si tienes menos de 7000
         return estado
 
-    # Carta 33: Error en codigo de barras
+    # Carta 33: Error en codigo de barras // reversion de acciones
     #   - No se venden productos este mes:
     #   - reputación baja 2 niveles
     elif numero == 33:
@@ -203,11 +203,11 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 34: Mal diseño del empaque
+    # Carta 34: Mal diseño del empaque // reversion de las acciones
     #   - Ventas −25%
     #   - reputación baja 2 niveles
     # Duración: 2 turnos
-    elif numero == 34: # se aplicara en estado final depende del orden que se ejecute
+    elif numero == 34:
         estado["carta34"]==2
         return estado
 
@@ -224,29 +224,34 @@ def aplicar_carta(numero, estado):
     elif numero == 36:
         return estado
 
-    # Carta 37: Trabajador se accidenta
+    # Carta 37: Trabajador se accidenta // reversion de las acciones
     #   - Multas +4000.
     #   - Produccion −50% este mes
     #   - Temporalmente -1 trabajador por 2 turnos
     elif numero == 37:
+        estado["d_trabajador"]=2
         return estado
 
-    # Carta 38: Derrame quimico
+    # Carta 38: Derrame quimico // reversion de las acciones
     #   - Inventario e Insumos = 0
     #   - No puedes producir durante este mes y el siguiente
     elif numero == 38:
+        estado["Inventario"],estado["Insumos Disponibles"]=0,0
+        estado["r_producir"]=2
         return estado
 
-    # Carta 39: Virus contagioso
+    # Carta 39: Virus contagioso // necesario una reversion de las acciones
     #   Todos los empleados se quedaron en su casa por un mes
     #   No se vende ni se produce
     elif numero == 39:
+        estado["r_produccion"]=True
         return estado
 
     # Carta 40: Hiring Freeze
     #   No puedes contratar empleados nuevos
     # Duración: 5 turnos
     elif numero == 40:
+        estado["r_contrato"]=5
         return estado
 
     # Si el numero no coincide con ninguna carta:

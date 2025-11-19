@@ -38,13 +38,17 @@ def calcular_estado_inicial():
         "BrandingActivo":                    False,
         "MantenimientoHecho":                False,
         "EcommerceActivo":                   False,
-        "InventarioMesAnterior":             0
+        "IncentivosActivos":                 False, # agregado por mi
+        "InventarioMesAnterior":             0,
+        #contador de las cartas del caos
+
         # contadores agregados por mi
         "duracion_demanda": 0,
         "competidores_nuevos": 0,
         "duracion_ecommerce": 0,
         "contador_fondo_emergencia": 0,
-        "Ventas": 0  # vinculado al estado final
+        "Ventas": 0,  # vinculado al estado final
+        "Subida de sueldo":0,
         "Registro_de_cambios":{}# usare esto de aca para revertir efectos de las acciones
     }
 

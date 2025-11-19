@@ -26,6 +26,7 @@ def produccion_producir(estado):
     return estado
 
 def produccion_pedido_encargo(estado):
+
     """
     2. Producir por encargo:
     Aceptamos un pedido de produccion para otra fabrica,
@@ -41,6 +42,7 @@ def produccion_pedido_encargo(estado):
     return estado
 
 def produccion_mejorar_proceso(estado):
+
     """
     3. Mejorar proceso:
     - Aumenta permanentemente la eficiencia de todas las maquinas.
@@ -78,22 +80,13 @@ def produccion_mantenimiento_maquinaria(estado):
 def produccion_comprar_nueva_maquina(estado):
     if estado["Caja disponible"]>10000:
         estado["Caja disponible"]-=10000
-
-    """
-    5. Comprar nueva maquina:
-    - Resta S/ 10 000 de “Caja disponible”.
-    - Añade 1 al total de maquinas y 1 a maquinas activas:
-        • Actualiza “Maquinas (total/activas/dañadas)” en formato “str/str/str”.
-    - Si no hay dinero, debes pedir un préstamo al 12% de interes
-        • Es decir, compras la maquina nueva y te haces una deuda de S/ 11,200
-    """
+    elif estado["Caja disponible"]<=10000:
+        estado["Caja disponible"] =0
+        estado["Deuda pendiente"]+=11200
+    estado["Maquinas (total/activas/dañadas)"] = str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-3]) + 1) + "/" + str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2]) + 1) +"/"+ str(estado["Maquinas (total/activas/dañadas)"].split("/")[-1])
     return estado
 
 def produccion_no_hacer_nada(estado):
-    """
-    6. No hacer nada en el area de produccion este turno:
-    - Simplemente retorna el estado sin cambios.
-    """
     return estado
 
 # ---------------- Recursos Humanos ----------------
@@ -122,6 +115,12 @@ def rh_contratar_personal_temporal(estado):
     return estado
 
 def rh_implementar_incentivos(estado):
+    if estado["Caja disponible"] >= 5000:
+        estado["Caja disponible"] -= 5000
+    elif estado["Caja disponible"] < 5000:
+        estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["IncentivosActivos"]=True
     """
     3. Implementar incentivos:
     - Gasta S/ 5 000 en bonos.
@@ -155,6 +154,15 @@ def rh_capacitar_seguridad(estado):
     return estado
 
 def rh_subir_sueldos(estado):
+    if estado["Subida de sueldo"]==0:
+        estado["Costo por empleado"]=estado["Costo por empleado"]*1.1
+    elif estado["Subida de sueldo"]==1:
+        estado["Costo por empleado"]=estado["Costo por empleado"]*1.07
+    elif estado["Subida de sueldo"]==2:
+        estado["Costo por empleado"]=estado["Costo por empleado"]*1.04
+    elif estado["Subida de sueldo"]==1:
+        estado["Costo por empleado"]=estado["Costo por empleado"]*1.015
+    estado["Subida de sueldo"] += 1
     """
     6. Subir sueldos:
     - Aumenta en X% el salario de todos los empleados
@@ -167,10 +175,6 @@ def rh_subir_sueldos(estado):
     return estado
 
 def rh_no_hacer_nada(estado):
-    """
-    7. No hacer nada en el area de Recursos Humanos este turno:
-    - Retorna el estado tal cual, sin cambios.
-    """
     return estado
 
 

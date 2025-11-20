@@ -43,6 +43,7 @@ def calcular_estado_inicial():
         #contador de las cartas del caos
 
         # contadores agregados por mi
+        "mejora_proceso":0,
         "duracion_demanda": 0,
         "competidores_nuevos": 0,
         "duracion_ecommerce": 0,

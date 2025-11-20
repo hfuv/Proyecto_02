@@ -3,6 +3,18 @@
 # ---------------- Produccion ----------------
 
 def produccion_producir(estado):
+    f=1
+    if estado["Cantidad de empleados"]>4:
+        f=estado["Cantidad de empleados"]-4
+    if estado["Prohibir Produccion"]==False:
+        for a in range(1,int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2])+1):
+            if estado["Insumos disponibles"]>=40000:
+                estado["Insumos disponibles"]-=40000*f*0.1
+                estado["Inventario"]+=2000
+            else:
+                break
+        estado["TurnosProduccionExtra"]=2
+
     """
     1. Producir:
     - Si existe el flag "Prohibir Produccion" (== True), no produce nada.
@@ -19,13 +31,21 @@ def produccion_producir(estado):
               (ver archivo estado.py)
     - Por cada empleado adicional contratado, la produccion aumenta en 10%, sin gastar insumos.
         • Esto se debe a que los empelados introducen eficiencias en el proceso productivo
-    - Todos los turnos se peude producir, es decir, las maquinas no quedan ocupadas.
+    - Todos los turnos se puede producir, es decir, las maquinas no quedan ocupadas.
         • Esto se debe a que el proceso productivo tiene diferentes fases
     - Si no hay suficientes insumos no se puede producir.
     """
     return estado
 
 def produccion_pedido_encargo(estado):
+    if estado["Prohibir Produccion"] == False:
+        for a in range(1, int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2]) + 1):
+            if estado["Insumos disponibles"] >= 10000:
+                estado["Insumos disponibles"] -= 10000
+                estado["Caja disponible"] += 50000
+            else:
+                estado["Mensaje de procesos no admitidos"]="No se pudo producir por encargo(falta insumos)" # esto es opcional creo
+                break
 
     """
     2. Producir por encargo:
@@ -41,7 +61,10 @@ def produccion_pedido_encargo(estado):
     """
     return estado
 
-def produccion_mejorar_proceso(estado):
+def produccion_mejorar_proceso(estado): # no se cuanto es la produccion base
+    if estado["mejora_proceso"]==1:
+       estado["mejora_proceso"]=0
+    estado["mejora_proceso"]+=5
 
     """
     3. Mejorar proceso:

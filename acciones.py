@@ -476,6 +476,11 @@ def compras_no_hacer_nada(estado):
 # ---------------- Finanzas ----------------
 
 def finanzas_pagar_proveedores(estado): # no entiendo
+    if estado["Caja disponible"]>=(sum(estado["Registro_de_deudas"].values())*0.95):
+        estado["Caja disponible"]-=sum(estado["Registro_de_deudas"].values())*0.95
+    else:
+        estado["Deuda pendiente"]+=1.12*(sum(estado["Registro_de_deudas"].values())*0.95-estado["Caja disponible"])
+        estado["Caja disponible"]=0
     """
     1. Pagar proveedores:
     Esta funcion esta relacionada con compras_negociar_credito.
@@ -531,12 +536,6 @@ def finanzas_pagar_deuda(estado):
 def finanzas_solicitar_prestamo(estado):
     estado["Caja disponible"] += 40000
     estado["Deuda pendiente"]+=42400
-    """
-    3. Solicitar prestamo:
-    - Pides un préstamo de S/40,000 con un interés del 6%
-    - Añade S/ 40,000 a “Caja disponible”.
-    - Añade S/ 42,400 a “Deuda pendiente”.
-    """
     return estado
 
 

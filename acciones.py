@@ -57,6 +57,9 @@ def produccion_mejorar_proceso(estado):
     return estado
 
 def produccion_mantenimiento_maquinaria(estado):
+    estado["Maquinas (total/activas/dañadas)"]=str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-3]))+"/"+str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2])+int(estado["Maquinas (total/activas/dañadas)"].split("/")[-1]))+"/"+"0"
+    estado["MantenimientoHecho"]=True
+    estado["Contador_mantenimiento"]=3
     """
     4. Mantenimiento de maquinaria:
     - Repara todas las maquinas dañadas, pasandolas a activas:
@@ -190,6 +193,15 @@ def rh_no_hacer_nada(estado):
 # ---------------- Marketing ----------------
 
 def marketing_lanzar_campania(estado):
+    if estado["Caja disponible"] >= 8000:
+        estado["Caja disponible"] -= 8000
+    elif estado["Caja disponible"] < 8000:
+        estado["Deuda pendiente"] += (8000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    if int(estado["Reputacion del mercado"].split()[-1])<7:
+        estado["Reputacion del mercado"]="Nivel 7"
+    estado["lanzar_campania"]=2
+    estado["bloqueador_campania"]=5
     """
     1. Lanzar campaña de promocion:
     - Gasta S/ 8 000 de “Caja disponible”.
@@ -197,7 +209,7 @@ def marketing_lanzar_campania(estado):
       • Si la reputacion era mayor a 7, se mantiene en el valor que tenia (no aumenta mas).
     - Añade “DemandaExtraTemporal” de +4000 unidades para el turno actual y el siguiente.
     - Aumenta nuestras ventas en 20% por dos turnos
-      • Solo aumenta si existe inventario disponible para la venta.
+      • Solo aumenta si existe inventario disponible para la venta.           // en estado final creo
       • Es posible vender por encima de los pedidos que teniamos (porque aparece demanda espontanea para este mismo mes).
     - Bloquea por 5 turnos los efectos de las cartas del Caos relacionados a baja demanda, baja aceptacion del producto o cancelación de pedidos.
         • Los otros efectos de dichas cartas sí se aplicarán
@@ -291,14 +303,21 @@ def marketing_abrir_ecommerce(estado):
     return estado
 
 def marketing_co_branding(estado):
+    if estado["Caja disponible"] >= 3000:
+        estado["Caja disponible"] -= 3000
+    elif estado["Caja disponible"] < 3000:
+        estado["Deuda pendiente"] += (3000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["contador_co-branding"]=2
+
     """
-    5. Alianza co-branding con maca o influencer muy popular:
+    5. Alianza co-branding con marca o influencer muy popular:
     - Gasta S/ 3 000 de “Caja disponible”.
     - Añade “DemandaExtraTemporal” de +300,000 este mes y +100,000 el proximo mes.
       • Es posible que en alianzas con marcas o influencer gigantescos
         no tengamos la capacidad para producir la cantidad de demanda que se genere.
-      • Esta demanda no es permanente, si no se atiende, el nivel de demanda regres aa su valor
-    - Aumenta nuestras ventas en 20% por dos turnos
+      • Esta demanda no es permanente, si no se atiende, el nivel de demanda regresa a su valor 
+    - Aumenta nuestras ventas en 20% por dos turnos                    // se usara un if en estado final
       (siempre y cuando exista inventario disponible para la venta).
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, realizas la alianza, y te haces una deuda de S/ 3,360
@@ -366,7 +385,9 @@ def compras_comprar_insumos_importados_premium(estado):
     return estado
 
 def compras_vender_excedentes_insumos(estado):
-
+    estado["Caja disponible"] += 0.1 * estado["Insumos disponibles"]
+    estado["Insumos disponibles"]=0.9*estado["Insumos disponibles"]
+    estado["venta_excedente"]=3
     """
     4. Venta de excedentes de insumos:
     - Se sabe que los meses que no hay produccion, el 10% de insumos caducan.
@@ -378,6 +399,14 @@ def compras_vender_excedentes_insumos(estado):
     return estado
 
 def compras_negociar_precio(estado):
+    if estado["Caja disponible"] >= 5000:
+        estado["Caja disponible"] -= 5000
+    elif estado["Caja disponible"] < 5000:
+        estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["Activacion_descuento"]=True # tal vez sea innecesario esta linea
+    estado["Descuento_compra"]=0.7
+
     """
     5. Negociar precio con proveedores:
     - Gasta S/ 5 000 de “Caja disponible”.
@@ -390,6 +419,20 @@ def compras_negociar_precio(estado):
     return estado
 
 def compras_negociar_credito(estado):
+    if estado["Caja disponible"] >= 2000:
+        estado["Caja disponible"] -= 2000
+    elif estado["Caja disponible"] < 2000:
+        estado["Deuda pendiente"] += (2000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["CreditoConcedido"]=True
+    k=['a','b','c','d']
+    if estado["indice_deudas"]<4:
+        estado["Registro_de_deudas"][k[estado["indice_deudas"]]]=3
+        estado["indice_deudas"]+=1
+    elif estado["indice_deudas"]==4:
+        estado["indice_deudas"]=0
+        estado["Registro_de_deudas"][k[estado["indice_deudas"]]] = 3
+        estado["indice_deudas"] += 1
     """
     6. Negociar credito con proveedores:
     - Gasta S/ 2 000 de “Caja disponible”.
@@ -409,7 +452,7 @@ def compras_no_hacer_nada(estado):
 
 # ---------------- Finanzas ----------------
 
-def finanzas_pagar_proveedores(estado):
+def finanzas_pagar_proveedores(estado): # no entiendo
     """
     1. Pagar proveedores:
     Esta funcion esta relacionada con compras_negociar_credito.

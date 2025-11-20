@@ -51,6 +51,8 @@ def calcular_estado_inicial():
         "Subida de sueldo":0,
         "bloqueador_clima":0,
         "Registro_de_cambios":{}# usare esto de aca para revertir efectos de las acciones
+        "Registro_de_deudas":{'a':0,'b':0,'c':0,'d':0}, # relacionado al credito de proveedores
+        "indice_deudas":0
     }
 
 def calcular_estado_final(estado):

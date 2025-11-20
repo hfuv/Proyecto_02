@@ -49,6 +49,7 @@ def calcular_estado_inicial():
         "contador_fondo_emergencia": 0,
         "Ventas": 0,  # vinculado al estado final
         "Subida de sueldo":0,
+        "bloqueador_clima":0,
         "Registro_de_cambios":{}# usare esto de aca para revertir efectos de las acciones
     }
 

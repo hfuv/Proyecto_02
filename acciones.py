@@ -104,6 +104,13 @@ def rh_contratar_personal_permanente(estado):
     return estado
 
 def rh_contratar_personal_temporal(estado):
+    if estado["Caja disponible"] > 10000:
+        estado["Caja disponible"] -= 10000
+    elif estado["Caja disponible"] <= 10000:
+        estado["Caja disponible"] = 0
+        estado["Deuda pendiente"] += 11200
+    estado["Contador_empleadosTemp"]=1
+
     """
     2. Outsourcing temporal:
     - Paga S/ 10 000 (pago unico unico) para sumar 4 empleados temporales solo este turno.
@@ -132,6 +139,7 @@ def rh_implementar_incentivos(estado):
     return estado
 
 def rh_medicion_clima(estado):
+    estado["bloqueador_clima"]=5
     """
     4. Medicion de clima laboral:
     - Sin costo, se hace con el personal interno de la empresa.
@@ -144,6 +152,7 @@ def rh_medicion_clima(estado):
     return estado
 
 def rh_capacitar_seguridad(estado):
+    estado["bloqueador_seguridad"]=3
     """
     5. Capacitar en seguridad:
     - Sin costo, la capacitacion la hace el propio personal de la empresa.
@@ -200,6 +209,16 @@ def marketing_lanzar_campania(estado):
     return estado
 
 def marketing_invertir_branding(estado):
+    if estado["Caja disponible"] >= 12000:
+        estado["Caja disponible"] -= 12000
+    elif estado["Caja disponible"] < 12000:
+        estado["Deuda pendiente"] += (12000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    if int(estado["Reputacion del mercado"].split()[-1])<8:
+        estado["reputacion anterior"] =int(estado["Reputacion del mercado"].split()[-1])
+        estado["Reputacion del mercado"]="Nivel 8"
+        estado["Temporizador_nivel"]=5
+    estado["BrandingActivo"]=True
     """
     2. Invertir en branding:
     - Gasta S/ 12 000 de “Caja disponible”.
@@ -294,6 +313,12 @@ def marketing_no_hacer_nada(estado):
 # ---------------- Compras ----------------
 
 def compras_comprar_insumos_nacionales(estado):
+    if estado["Caja disponible"] >= 10000:
+        estado["Caja disponible"] -= 10000
+    elif estado["Caja disponible"] < 10000:
+        estado["Deuda pendiente"] += (10000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["Insumos disponibles"]+=500000
     """
     1. Comprar insumos nacionales:
     - Gasta S/ 10 000 de “Caja disponible”.
@@ -304,6 +329,12 @@ def compras_comprar_insumos_nacionales(estado):
     return estado
 
 def compras_comprar_insumos_importados(estado):
+    if estado["Caja disponible"] >= 14000:
+        estado["Caja disponible"] -= 14000
+    elif estado["Caja disponible"] < 14000:
+        estado["Deuda pendiente"] += (14000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["Insumos disponibles"]+=800000
     """
     2. Comprar insumos importados:
     - Gasta S/ 14 000 de “Caja disponible”.
@@ -314,13 +345,20 @@ def compras_comprar_insumos_importados(estado):
     return estado
 
 def compras_comprar_insumos_importados_premium(estado):
+    if estado["Caja disponible"] >= 25000:
+        estado["Caja disponible"] -= 25000
+    elif estado["Caja disponible"] < 25000:
+        estado["Deuda pendiente"] += (25000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
+    estado["Insumos disponibles"]+=900000
+    estado["Contador_IP"]=5
     """
     3. Comprar insumos premium importados:
     - Gasta S/ 25 000 de “Caja disponible”.
     - Añade 900,000 a “Insumos disponibles”.
     - Aumenta la calidad de nuestros productos y la calidad percibida
-      • Esto incrementa la demanda en un 20% por 3 meses.
-      • Esto incrementa las ventas en un 20% por 3 meses.
+      • Esto incrementa la demanda en un 20% por 3 meses. -----------------aplicar en estado final
+      • Esto incrementa las ventas en un 20% por 3 meses.-----------------aplicar en estado final
         (siempre y cuando exista inventario disponible para la venta).
     - Si no hay dinero, debes pedir un préstamo al 12% de interes
         • Es decir, compras los insumos, y te haces una deuda de S/ 28,000
@@ -328,6 +366,7 @@ def compras_comprar_insumos_importados_premium(estado):
     return estado
 
 def compras_vender_excedentes_insumos(estado):
+
     """
     4. Venta de excedentes de insumos:
     - Se sabe que los meses que no hay produccion, el 10% de insumos caducan.
@@ -366,10 +405,6 @@ def compras_negociar_credito(estado):
 
 
 def compras_no_hacer_nada(estado):
-    """
-    7. No hacer nada en el area de Compras:
-    - Retorna el estado sin cambios.
-    """
     return estado
 
 # ---------------- Finanzas ----------------
@@ -390,8 +425,21 @@ def finanzas_pagar_proveedores(estado):
     return estado
 
 def finanzas_pagar_deuda(estado):
-    estado["Caja disponible"]>=10000
-
+    if estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"]>= 10000:
+        estado["Caja disponible"] -= 10000
+        estado["Deuda pendiente"]-= 10000
+    elif estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"] < 10000:
+        estado["Caja disponible"] -= estado["Deuda pendiente"]
+        estado["Deuda pendiente"] =0
+    elif estado["Caja disponible"] < 10000 and estado["Deuda pendiente"] >=10000:
+        estado["Deuda pendiente"]-=estado["Caja disponible"]
+        estado["Caja disponible"] = 0
+    elif 0<estado["Caja disponible"] < 10000 and 0<estado["Deuda pendiente"] < 10000:
+        if estado["Caja disponible"]>estado["Deuda pendiente"]:
+            estado["Caja disponible"] -=estado["Deuda pendiente"]
+        else:
+            estado["Deuda pendiente"]-=estado["Caja disponible"]
+            estado["Caja disponible"]=0
     """
     2. Pagar deuda:
 

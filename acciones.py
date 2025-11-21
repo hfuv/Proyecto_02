@@ -445,17 +445,16 @@ def compras_negociar_credito(estado):
     if estado["Caja disponible"] >= 2000:
         estado["Caja disponible"] -= 2000
     elif estado["Caja disponible"] < 2000:
-        estado["Deuda pendiente"] += (2000 - estado["Caja disponible"]) * 1.12
-        estado["Caja disponible"] = 0
+        k = ['a', 'b', 'c', 'd']  # indice se reinicia
+        estado["Registro_de_deudas(cantidad)"][estado["indice_deudas"]]=2000* 1.12
+        if estado["indice_deudas"] < 4:
+            estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+            estado["indice_deudas"] += 1
+        elif estado["indice_deudas"] == 4:
+            estado["indice_deudas"] = 0
+            estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+            estado["indice_deudas"] += 1
     estado["CreditoConcedido"]=True # creo que es opcional xd debido a que mi codigo llega a manejar 3 deudas mediante cuentas separadas
-    k=['a','b','c','d'] # indice se reinicia
-    if estado["indice_deudas"]<4:
-        estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]]=3
-        estado["indice_deudas"]+=1
-    elif estado["indice_deudas"]==4:
-        estado["indice_deudas"]=0
-        estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
-        estado["indice_deudas"] += 1
     """
     6. Negociar credito con proveedores:
     - Gasta S/ 2 000 de “Caja disponible”.
@@ -481,6 +480,9 @@ def finanzas_pagar_proveedores(estado): # no entiendo
     else:
         estado["Deuda pendiente"]+=1.12*(sum(estado["Registro_de_deudas(cantidad)"].values())*0.95-estado["Caja disponible"])
         estado["Caja disponible"]=0
+    for f in ['a', 'b', 'c', 'd']:
+        estado["Registro_de_deudas(cantidad)"][f]=0
+        estado["Registro_de_deudas(duracion)"][f] = 0
     estado["indice_deudas"] = 0
     """
     1. Pagar proveedores:

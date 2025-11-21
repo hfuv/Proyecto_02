@@ -58,7 +58,11 @@ def calcular_estado_inicial():
     }
 
 def calcular_estado_final(estado):
-#1-------------------
+# funcion agregada por mi para multi deudas
+    for s, d in estado["Registro_de_deudas(duracion)"].items():
+       if d != 0:
+          estado["Registro_de_deudas(duracion)"][s] -= 1
+    #1-------------------
     while estado["Inventario"]>0 :
         if estado["Pedidos por atender"]>0:
            estado["Pedidos por atender"]-=1

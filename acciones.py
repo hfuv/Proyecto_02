@@ -2,23 +2,33 @@
 
 # ---------------- Produccion ----------------
 
-def produccion_producir(estado):
-    f=1
+def produccion_producir(estado): # llamar al diccionario para la reconstruccion necesaria
+    f=0
     if estado["Cantidad de empleados"]>4:
         f=estado["Cantidad de empleados"]-4
-    if estado["Prohibir Produccion"]==False:
+    d=estado["Prohibir Produccion"]==False and estado["r_producir"]==0
+    if d or estado["r_produccion"]==0:
         for a in range(1,int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2])+1):
-            if estado["Insumos disponibles"]>=40000:
-                estado["Insumos disponibles"]-=40000*f*0.1
-                estado["Inventario"]+=2000
+            if f>=1:
+                if estado["Insumos disponibles"] >= 40000* f * 0.9:
+                    estado["Insumos disponibles"] -= 40000 * f * 0.9
+                    estado["Inventario"] += 2000
+                    estado["contador_actual"]["antes_insumos"] += 40000 * f * 0.9
+                    estado["contador_actual"]["antes_inventario"] +=2000
+                else:
+                    break
+
             else:
-                break
+                if estado["Insumos disponibles"] >= 40000:
+                    estado["Insumos disponibles"] -= 40000
+                    estado["Inventario"] += 2000
+                    estado["contador_actual"]["antes_insumos"] += 40000
+                    estado["contador_actual"]["antes_inventario"] += 2000
+                else:
+                    break
+
         estado["TurnosProduccionExtra"]=2
 
-    """
-    - Por cada empleado adicional contratado, la produccion aumenta en 10%, sin gastar insumos.
-        • Esto se debe a que los empelados introducen eficiencias en el proceso productivo
-    """
     return estado
 
 def produccion_pedido_encargo(estado):
@@ -59,8 +69,9 @@ def produccion_no_hacer_nada(estado):
 # ---------------- Recursos Humanos ----------------
 
 def rh_contratar_personal_permanente(estado):
-    estado["Cantidad de empleados"] += 1
-    estado["Sueldos por pagar"] += 4000
+    if estado["r_contrato-empleados"]==0:
+        estado["Cantidad de empleados"] += 1
+        estado["Sueldos por pagar"] += 4000
     return estado
 
 def rh_contratar_personal_temporal(estado):

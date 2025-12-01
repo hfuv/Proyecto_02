@@ -111,7 +111,7 @@ def aplicar_carta(numero, estado):
     #   - Ventas de esta semana reducidas al 50%:
     # Duración: 2 turnos
     elif numero == 12:
-        estado["R-12"]=50
+        estado["R-12"]=2
         return estado
 
     # Carta 13: Error de etiquetado // reversion de acciones
@@ -311,9 +311,14 @@ def aplicar_carta(numero, estado):
         return estado
 
     elif numero == 37: # aplicacion de 50%
+        s=['a','b','c']
         if estado["bloqueador_seguridad"]== 0:
             estado["Multas e indemnizaciones"] += 4000
             estado["carta37"] = 2  # Produccion −50% este mes#   - Temporalmente -1 trabajador por 2 turnos
+            estado["Registro_cambios37(tiempo)"][s[estado["indice_deudas(cambios)"]]]=2
+            estado["Registro_cambios37"][s[estado["indice_deudas(cambios)"]]]=1
+            estado["Cantidad de empleados"]-=1
+            estado["37"]=True
         return estado
 
     elif numero == 38:

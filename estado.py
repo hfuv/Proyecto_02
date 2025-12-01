@@ -40,7 +40,6 @@ def calcular_estado_inicial():
         "InventarioMesAnterior":             0,
 
         # contadores agregados por mi
-        "registro de ventas":['a','b'],
         "registro de ventas_precios": [0, 0],
         "registro de ventas_indice": 0,
         "mejora_proceso":0,
@@ -51,8 +50,11 @@ def calcular_estado_inicial():
         "Ventas": 0,  # vinculado al estado final
         "Subida de sueldo":0,
         "bloqueador_clima":0, # uso de registro para tener doble control sobre las cartas
-        "Cambios_carta":{"":3,"":4,"":3,"":2}# usare esto de aca para revertir efectos de las acciones
-        "contador_actual":{}
+        "contador_actual":{"antes_inventario":0,"antes_insumos":0},
+        "Registro_cambios37(tiempo)": {'a': 0, 'b': 0, 'c': 0}, # reiniciar pasado eso
+        "Registro_cambios37": {'a': 0, 'b': 0, 'c': 0},
+        "indice_deudas(cambios)": 0,
+
         #
         "Registro_de_deudas(duracion)":{'a':0,'b':0,'c':0,'d':0}, # relacionado al credito de proveedores
         "Registro_de_deudas(cantidad)": {'a': 0, 'b': 0, 'c': 0, 'd': 0},
@@ -76,15 +78,23 @@ def calcular_estado_final(estado):
     elif estado["indice_deudas"] == 4:
         estado["indice_deudas"] = 0
     #----------------------------------------------------------------------------------------
+
     #1-------------------
     while estado["Inventario"]>0 :
         if estado["Pedidos por atender"]>0:
            estado["Pedidos por atender"]-=1
            estado["Unidades vendidas"]+=1
            estado["Caja disponible"] += estado["Precio Venta"]
+           estado["Ventas"]+=1
         elif estado["Pedidos por atender"]==0:
             break
         estado["Inventario"] -= 1
+    if estado["registro de ventas_indice"]==0:
+        estado["registro de ventas_precios"][estado["registro de ventas_indice"]]=estado["Ventas"]
+        estado["registro de ventas_indice"]+=1
+    elif estado["registro de ventas_indice"]==1:
+        estado["registro de ventas_precios"][estado["registro de ventas_indice"]] = estado["Ventas"]
+        estado["registro de ventas_indice"]=0
     if estado["Pedidos por atender"]>0:
         estado["Reputacion del mercado"]="Nivel"+" "+ str(int(estado["Reputacion del mercado"].split()[-1])-1)
     """
@@ -152,6 +162,16 @@ def calcular_estado_final(estado):
      """
 #5-------------------------------------------------
 #me falta programar las cartas
+    # carta 37
+    if estado["indice_deudas(cambios)"]<=0:
+        estado["indice_deudas(cambios)"]+=1
+        estado["indice_deudas(cambios)"]+=1
+    elif estado["indice_deudas(cambios)"]==2:
+        estado["Cantidad de empleados"]+=1
+        estado["indice_deudas(cambios)"]=0
+    if estado["37"]==True: # "contador_actual":{"antes_empleados":0,"antes_inventario":0,"antes_insumos":0},
+        estado["Inventario"]-=(estado["contador actual"]["antes_inventario"])/2
+        estado["Insumos disponibles"]+=(estado["contador actual"]["antes_insumos"]/2)
     """""
        5) Anular multas, accidentes, y demas cartas del caos
        - Esto dependera de la carta del caos que haya salido, y de los flags que tengas activos.

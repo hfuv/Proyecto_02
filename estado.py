@@ -172,6 +172,9 @@ def calcular_estado_final(estado):
     if estado["37"]==True: # "contador_actual":{"antes_empleados":0,"antes_inventario":0,"antes_insumos":0},
         estado["Inventario"]-=(estado["contador actual"]["antes_inventario"])/2
         estado["Insumos disponibles"]+=(estado["contador actual"]["antes_insumos"]/2)
+# carta 4
+    if estado["perdida"]==True:
+       estado["Inventario"]=0
     """""
        5) Anular multas, accidentes, y demas cartas del caos
        - Esto dependera de la carta del caos que haya salido, y de los flags que tengas activos.

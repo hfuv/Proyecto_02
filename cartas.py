@@ -34,8 +34,6 @@ def aplicar_carta(numero, estado):
                 estado["Reputacion del mercado"] = "Nivel " + str(0)
         return estado
 
-    # Carta 4: Incendio en almacen
-    #   - Se pierde el inventario total (al final del mes, despues de haber producido y vendido)
     elif numero == 4:
         estado["perdida"]=True
         return estado
@@ -194,7 +192,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 24:
+    elif numero == 24: # falta
         estado["r_venta"]=2
         return estado
 

@@ -61,10 +61,21 @@ def calcular_estado_inicial():
     }
 
 def calcular_estado_final(estado):
-# funcion agregada por mi para multi deudas
+    # funcion agregada por mi para multi deudas
     for s, d in estado["Registro_de_deudas(duracion)"].items():
        if d != 0:
           estado["Registro_de_deudas(duracion)"][s] -= 1
+       if d ==0:
+           if estado["Caja disponible"]>=estado["Registro_de_deudas(cantidad)"][s]:
+              estado["Caja disponible"]-=estado["Registro_de_deudas(cantidad)"][s]
+           else:
+               estado["Deuda pendiente"]+=(estado["Registro_de_deudas(cantidad)"][s]-estado["Caja disponible"])*1.12
+               estado["Caja disponible"]=0
+    if estado["indice_deudas"] < 4:
+        estado["indice_deudas"] += 1
+    elif estado["indice_deudas"] == 4:
+        estado["indice_deudas"] = 0
+    #----------------------------------------------------------------------------------------
     #1-------------------
     while estado["Inventario"]>0 :
         if estado["Pedidos por atender"]>0:
@@ -88,10 +99,12 @@ def calcular_estado_final(estado):
        - Si no se atiende el total de la demanda, la 'Reputacion del mercado' se reduce un nivel """
 #2----------------------------------------------------
     estado["Pedidos por atender"]=1000*int(estado["Reputacion del mercado"].split()[-1])
-    if estado["BrandingActivo"]==True:
+    if estado["BrandingActivo"]==True and estado["duracion_branding"]>0:
         estado["Demanda"]=estado["Demanda"]*1.1
-    if estado["EcommerceActivo"]==True:
+        estado["duracion_branding"]-=1
+    if estado["EcommerceActivo"]==True and estado["duracion_ecommerce"]>0:
         estado["Demanda"]=estado["Demanda"]+5000
+        estado["duracion_ecommerce"] -=1
     if estado["DemandaExtraTemporal"]==True:
         if estado["DuracionRestante->Temporal"]==2:
             estado["Demanda"]=estado["Demanda"]+300000

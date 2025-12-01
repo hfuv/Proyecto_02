@@ -142,10 +142,6 @@ def marketing_invertir_branding(estado):
         estado["Temporizador_nivel"]=5
     estado["BrandingActivo"]=True
     estado["duracion_branding"]=5
-    """
-    - Puedes fijar el flag “BrandingActivo = True” para que la demanda base
-      suba un 10 % en calcular_estado_final durante estos 5 turnos.
-    """
     return estado
 
 def marketing_estudio_mercado(estado):
@@ -177,8 +173,6 @@ def marketing_abrir_ecommerce(estado):
             estado["Caja disponible"] = 0
     estado["duracion_ecommerce"] = 3
     """
-            • Aumenta permanentemente “Pedidos por atender” en +5,000 por turno
-              (se aplica en calcular_estado_final).
             • Aumenta permanentemente “Ventas” en +2,000 por turno
               (siempre y cuando exista inventario disponible para la venta).
             • Esto bloquea por 3 turnos cualquier Carta del Caos que afecte el e-comerce.
@@ -205,30 +199,67 @@ def marketing_no_hacer_nada(estado):
 
 # ---------------- Compras ----------------
 
-def compras_comprar_insumos_nacionales(estado):
-    if estado["Caja disponible"] >= 10000:
-        estado["Caja disponible"] -= 10000
-    elif estado["Caja disponible"] < 10000:
-        estado["Deuda pendiente"] += (10000 - estado["Caja disponible"]) * 1.12
-        estado["Caja disponible"] = 0
-    estado["Insumos disponibles"]+=500000
+def compras_comprar_insumos_nacionales(estado): # indice se desplaza en estado final
+    if estado["CreditoConcedido"]==True:
+        if estado["Activacion_descuento"] == True:
+            #estado["Caja disponible"] >= ):
+            k = ['a', 'b', 'c', 'd']  # indice se reinicia
+            if estado["indice_deudas"] < 4:
+                estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 10000 * (1 - estado["Descuento_compra"])
+                estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+        else:
+            k = ['a', 'b', 'c', 'd']
+            if estado["indice_deudas"] < 4:
+                estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 10000
+                estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+
+        estado["Insumos disponibles"] += 500000
+    else:
+        if estado["Activacion_descuento"] == True:
+            if estado["Caja disponible"] >= 10000 * (1 - estado["Descuento_compra"]):
+                estado["Caja disponible"] -= 10000 * (1 - estado["Descuento_compra"])
+            elif estado["Caja disponible"] < 10000 * (1 - estado["Descuento_compra"]):
+                estado["Deuda pendiente"] += (10000 * (1 - estado["Descuento_compra"]) - estado[
+                    "Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            estado["Insumos disponibles"] += 500000
+        else:
+            if estado["Caja disponible"] >= 10000:
+                estado["Caja disponible"] -= 10000
+            elif estado["Caja disponible"] < 10000:
+                estado["Deuda pendiente"] += (10000 - estado["Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            estado["Insumos disponibles"] += 500000
+
     return estado
 
 def compras_comprar_insumos_importados(estado):
-    if estado["Caja disponible"] >= 14000:
-        estado["Caja disponible"] -= 14000
-    elif estado["Caja disponible"] < 14000:
-        estado["Deuda pendiente"] += (14000 - estado["Caja disponible"]) * 1.12
-        estado["Caja disponible"] = 0
+    if estado["Activacion_descuento"] == True:
+        k = ['a', 'b', 'c', 'd']
+        estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 14000
+        estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+    else:
+        if estado["Caja disponible"] >= 14000:
+            estado["Caja disponible"] -= 14000
+        elif estado["Caja disponible"] < 14000:
+            estado["Deuda pendiente"] += (14000 - estado["Caja disponible"]) * 1.12
+            estado["Caja disponible"] = 0
+
     estado["Insumos disponibles"]+=800000
     return estado
 
 def compras_comprar_insumos_importados_premium(estado):
-    if estado["Caja disponible"] >= 25000:
-        estado["Caja disponible"] -= 25000
-    elif estado["Caja disponible"] < 25000:
-        estado["Deuda pendiente"] += (25000 - estado["Caja disponible"]) * 1.12
-        estado["Caja disponible"] = 0
+    if estado["Activacion_descuento"] == True:
+        k = ['a', 'b', 'c', 'd']
+        estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 25000
+        estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
+    else:
+        if estado["Caja disponible"] >= 25000:
+            estado["Caja disponible"] -= 25000
+        elif estado["Caja disponible"] < 25000:
+            estado["Deuda pendiente"] += (25000 - estado["Caja disponible"]) * 1.12
+            estado["Caja disponible"] = 0
+
     estado["Insumos disponibles"]+=900000
     estado["Contador_IP"]=3
     return estado
@@ -253,15 +284,8 @@ def compras_negociar_credito(estado): # falta ajustar
     if estado["Caja disponible"] >= 2000:
         estado["Caja disponible"] -= 2000
     elif estado["Caja disponible"] < 2000:
-        k = ['a', 'b', 'c', 'd']  # indice se reinicia
-        estado["Registro_de_deudas(cantidad)"][estado["indice_deudas"]]=2000* 1.12
-        if estado["indice_deudas"] < 4:
-            estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
-            estado["indice_deudas"] += 1
-        elif estado["indice_deudas"] == 4:
-            estado["indice_deudas"] = 0
-            estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
-            estado["indice_deudas"] += 1
+        estado["Deuda pendiente"] += (2000 - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
     estado["CreditoConcedido"]=True
     return estado
 
@@ -281,16 +305,6 @@ def finanzas_pagar_proveedores(estado): # no entiendo
         estado["Registro_de_deudas(cantidad)"][f]=0
         estado["Registro_de_deudas(duracion)"][f] = 0
     estado["indice_deudas"] = 0
-    # falta el if para cuando este activo y no este activo
-    """
-    1. Pagar proveedores:
-    Esta funcion esta relacionada con compras_negociar_credito.
-    Aplica para compras de insumos al credito.
-    Efecto:
-    Pagar al contado todas las cuentas por pagar, obteniendo un descuento del 5% por pronto pago.
-    - Solo aplica para compra de insumos
-    - Si no tenemos deudas a 90, 60 o 30 dias, esta accion no hace nada.
-    """
     return estado
 def finanzas_pagar_deuda(estado):
     if estado["Caja disponible"]!=0 and estado["Deuda pendiente"]!=0:

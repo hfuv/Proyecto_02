@@ -72,7 +72,7 @@ def calcular_estado_final(estado):
             break
         estado["Inventario"] -= 1
     if estado["Pedidos por atender"]>0:
-        estado["Reputacion del mercado"]="Nivel"+" "+ str(int(estado["Reputacion del mercado"][-1])-1)
+        estado["Reputacion del mercado"]="Nivel"+" "+ str(int(estado["Reputacion del mercado"].split()[-1])-1)
     """
     Aplica las formulas de calculo al final de cada turno (mes) en el siguiente orden:
 
@@ -84,7 +84,7 @@ def calcular_estado_final(estado):
        - Descontar Pedidos por atender’
        - Si no se atiende el total de la demanda, la 'Reputacion del mercado' se reduce un nivel """
 #2----------------------------------------------------
-    estado["Pedidos por atender"]=1000*int(estado["Reputacion del mercado"][-1])
+    estado["Pedidos por atender"]=1000*int(estado["Reputacion del mercado"].split()[-1])
     if estado["BrandingActivo"]==True:
         estado["Demanda"]=estado["Demanda"]*1.1
     if estado["EcommerceActivo"]==True:
@@ -115,7 +115,7 @@ def calcular_estado_final(estado):
     if estado ["Caja disponible"] >= estado["Sueldos por pagar"]:
            estado["Caja disponible"]-=estado["Sueldos por pagar"]
     elif estado["Caja disponible"] < estado["Sueldos por pagar"]:
-           estado["Deuda pendiente"]=(estado["Sueldos por pagar"]-estado["Caja disponible"])*1.12
+           estado["Deuda pendiente"]+=(estado["Sueldos por pagar"]-estado["Caja disponible"])*1.12
            estado["Caja disponible"]=0
     """
     3) Pago de la nomina del mes actual

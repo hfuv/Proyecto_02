@@ -16,13 +16,6 @@ def produccion_producir(estado):
         estado["TurnosProduccionExtra"]=2
 
     """
-    1. Producir:
-    - Si existe el flag "Prohibir Produccion" (== True), no produce nada.
-        • Ademas, usted debe implementar algun mecanismo para contar cuantos turnos de la prohibicion van pasando
-    - Si no hay prohibicion, cada maquina realiza lo siguiente:
-        • Consume 40 000 insumos (resta de “Insumos disponibles”).
-          -> solo si Insumos disponibles ≥ 40 000, caso contrario, esa maquina no produce nada
-        • Añade 2,000 unidades al inventario (suma a “Inventario”).
         • Marca que la produccion se realiza por dos turnos:
             – Debe crear o incrementar “TurnosProduccionExtra” en 2,
               para que en el siguiente turno se pueda volver a producir,
@@ -31,9 +24,6 @@ def produccion_producir(estado):
               (ver archivo estado.py)
     - Por cada empleado adicional contratado, la produccion aumenta en 10%, sin gastar insumos.
         • Esto se debe a que los empelados introducen eficiencias en el proceso productivo
-    - Todos los turnos se puede producir, es decir, las maquinas no quedan ocupadas.
-        • Esto se debe a que el proceso productivo tiene diferentes fases
-    - Si no hay suficientes insumos no se puede producir.
     """
     return estado
 
@@ -46,19 +36,6 @@ def produccion_pedido_encargo(estado):
             else:
                 estado["Mensaje de procesos no admitidos"]="No se pudo producir por encargo(falta insumos)" # esto es opcional creo
                 break
-
-    """
-    2. Producir por encargo:
-    Aceptamos un pedido de produccion para otra fabrica,
-    la cantidad producida no va al invnetario sino que se vende inmediatamente.
-    - Se debe controlar que no haya prohibicion y que existan insumos.
-    - Si se realiza la produccion por encargo:
-        • Genera caja inmediata de S/ 50,000 (suma a “Caja disponible”).
-        • Consume 10,000 insumos (resta de “Insumos disponibles”).
-    - Si no se realiza:
-        • No hace nada (no varia ningun campo).
-    - Si no hay suficientes insumos disponibles, no se puede producir por encargo.
-    """
     return estado
 
 def produccion_mejorar_proceso(estado): # no se cuanto es la produccion base
@@ -84,14 +61,6 @@ def produccion_mantenimiento_maquinaria(estado):
     estado["MantenimientoHecho"]=True
     estado["Contador_mantenimiento"]=3
     """
-    4. Mantenimiento de maquinaria:
-    - Repara todas las maquinas dañadas, pasandolas a activas:
-        • Ten en cuenta que las Maquinas (total/activas/dañadas) estan en formato “str/str/str”.
-          Es decir, separados por el simbolo de barra diagonal "/".
-          - No debes cambiar la estructura de total/activas/dañadas
-            porque asi esta programado el menu de Estado de la empresa.
-        • Todas las Dañadas pasan a Activas (el numero de dañadas se pone a 0,
-          el numero de activas aumenta en esa cantidad).
     - Reduce el riesgo de fallas futuras:
         • Fija el flag “MantenimientoHecho = True” para que la proxima carta
           de caos que dañe maquinas sea cancelada (incluyendo las fallas por mala maniobra del personal).
@@ -120,13 +89,6 @@ def produccion_no_hacer_nada(estado):
 def rh_contratar_personal_permanente(estado):
     estado["Cantidad de empleados"] += 1
     estado["Sueldos por pagar"] += 4000
-    """
-    1. Contratar personal permanente:
-    - Aumenta permanentemente S/ 4,000 de “Total Salarios”.
-    - Aumenta “Numero de empleados” en 1.
-    - Si se vuelve a ejecutar esta accion, se aumentan 4,000 mas en salarios y 1 mas en numero de empleados.
-    - Se puede seguir aumentnto el personal infinitas veces.
-    """
     return estado
 
 def rh_contratar_personal_temporal(estado):
@@ -135,6 +97,7 @@ def rh_contratar_personal_temporal(estado):
     elif estado["Caja disponible"] <= 10000:
         estado["Caja disponible"] = 0
         estado["Deuda pendiente"] += 11200
+    # falta los empleados temporales
     estado["Contador_empleadosTemp"]=1
 
     """
@@ -156,11 +119,7 @@ def rh_implementar_incentivos(estado):
     estado["IncentivosActivos"]=True
     """
     3. Implementar incentivos:
-    - Gasta S/ 5 000 en bonos.
-    - Puedes fijar el flag “IncentivosActivos = True” para que, en calcular_estado_final,
       el inventario producido por 5 turnos se multiplique por 1.2 (20 % extra).
-    - Si no hay dinero, debes pedir un préstamo al 12% de interes
-        • Es decir, implementas el incentivo, y te haces una deuda de S/ 5,600
     """
     return estado
 
@@ -197,16 +156,7 @@ def rh_subir_sueldos(estado):
         estado["Costo por empleado"]=estado["Costo por empleado"]*1.04
     elif estado["Subida de sueldo"]==1:
         estado["Costo por empleado"]=estado["Costo por empleado"]*1.015
-    estado["Subida de sueldo"] += 1
-    """
-    6. Subir sueldos:
-    - Aumenta en X% el salario de todos los empleados
-        • Donde X toma el valor de 10% la primera vez,
-          7% la segunda vez,
-          4% la tercera vez,
-          1.5%, el resto de veces.
-    - Bloquea por 3 turnos las cartas del caos relacionadas a las huelgas, bajo rendimiento o fuga de talento.
-    """
+    estado["Subida de sueldo"] += 1 # aumentar cada que se haga
     return estado
 
 def rh_no_hacer_nada(estado):
@@ -226,10 +176,6 @@ def marketing_lanzar_campania(estado):
     estado["lanzar_campania"]=2
     estado["bloqueador_campania"]=5
     """
-    1. Lanzar campaña de promocion:
-    - Gasta S/ 8 000 de “Caja disponible”.
-    - Sube “Reputacion del mercado” a “Nivel 7”
-      • Si la reputacion era mayor a 7, se mantiene en el valor que tenia (no aumenta mas).
     - Añade “DemandaExtraTemporal” de +4000 unidades para el turno actual y el siguiente.
     - Aumenta nuestras ventas en 20% por dos turnos
       • Solo aumenta si existe inventario disponible para la venta.           // en estado final creo
@@ -238,8 +184,6 @@ def marketing_lanzar_campania(estado):
         • Los otros efectos de dichas cartas sí se aplicarán
     - Bloquea por 5 turnos el efecyo de reputación de las cartas del caos que afecten reputación
         • Los otros efectos de dichas cartas sí se aplicarán
-    - Si no hay dinero, debes pedir un préstamo al 12% de interes
-        • Es decir, lanzas la campaña, y te haces una deuda de S/ 8,960
     """
     return estado
 
@@ -255,10 +199,6 @@ def marketing_invertir_branding(estado):
         estado["Temporizador_nivel"]=5
     estado["BrandingActivo"]=True
     """
-    2. Invertir en branding:
-    - Gasta S/ 12 000 de “Caja disponible”.
-    - Sube “Reputacion del mercado” a “Nivel 8” por 5 turnos.
-        • Despues de los 5 turnos, debera regresar al valor que tenia antes.
         • Si la reputacion era mayor a 8, se mantiene en el valor que tenia.
     - Puedes fijar el flag “BrandingActivo = True” para que la demanda base
       suba un 10 % en calcular_estado_final durante estos 5 turnos.
@@ -308,19 +248,11 @@ def marketing_abrir_ecommerce(estado):
             estado["Caja disponible"] = 0
     estado["duracion_ecommerce"] = 3
     """
-         4. Abrir canal e-commerce:
-         - Si “EcommerceActivo” es False:
-            • Gasta S/ 20,000 de “Caja disponible”.
-            • Fija “EcommerceActivo = True”.
             • Aumenta permanentemente “Pedidos por atender” en +5,000 por turno
               (se aplica en calcular_estado_final).
             • Aumenta permanentemente “Ventas” en +2,000 por turno
               (siempre y cuando exista inventario disponible para la venta).
-        - Si ya existe “EcommerceActivo” True:
-            • Gasta S/ 2 000 de “Caja disponible” para mantenimiento, sin aumentar la demanda.
             • Esto bloquea por 3 turnos cualquier Carta del Caos que afecte el e-comerce.
-        - Si no hay dinero, debes pedir un préstamo al 12% de interes
-            • Es decir, te haces una deuda de S/ 22,400 o S/2,240 según corresponda
     """
 
     return estado
@@ -441,7 +373,7 @@ def compras_negociar_precio(estado):
     """
     return estado
 
-def compras_negociar_credito(estado):
+def compras_negociar_credito(estado): # falta ajustar
     if estado["Caja disponible"] >= 2000:
         estado["Caja disponible"] -= 2000
     elif estado["Caja disponible"] < 2000:
@@ -497,23 +429,23 @@ def finanzas_pagar_proveedores(estado): # no entiendo
     Si no hay dinero, debes pedir un préstamo al 12% de interes equivalente al total del monto a pagar.
     """
     return estado
-
 def finanzas_pagar_deuda(estado):
-    if estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"]>= 10000:
-        estado["Caja disponible"] -= 10000
-        estado["Deuda pendiente"]-= 10000
-    elif estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"] < 10000:
-        estado["Caja disponible"] -= estado["Deuda pendiente"]
-        estado["Deuda pendiente"] =0
-    elif estado["Caja disponible"] < 10000 and estado["Deuda pendiente"] >=10000:
-        estado["Deuda pendiente"]-=estado["Caja disponible"]
-        estado["Caja disponible"] = 0
-    elif 0<estado["Caja disponible"] < 10000 and 0<estado["Deuda pendiente"] < 10000:
-        if estado["Caja disponible"]>estado["Deuda pendiente"]:
-            estado["Caja disponible"] -=estado["Deuda pendiente"]
-        else:
-            estado["Deuda pendiente"]-=estado["Caja disponible"]
-            estado["Caja disponible"]=0
+    if estado["Caja disponible"]!=0 and estado["Deuda pendiente"]!=0:
+        if estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"] >= 10000:
+            estado["Caja disponible"] -= 10000
+            estado["Deuda pendiente"] -= 10000
+        elif estado["Caja disponible"] >= 10000 and estado["Deuda pendiente"] < 10000:
+            estado["Caja disponible"] -= estado["Deuda pendiente"]
+            estado["Deuda pendiente"] = 0
+        elif estado["Caja disponible"] < 10000 and estado["Deuda pendiente"] >= 10000:
+            estado["Deuda pendiente"] -= estado["Caja disponible"]
+            estado["Caja disponible"] = 0
+        elif 0 < estado["Caja disponible"] < 10000 and 0 < estado["Deuda pendiente"] < 10000:
+            if estado["Caja disponible"] > estado["Deuda pendiente"]:
+               estado["Caja disponible"] -= estado["Deuda pendiente"]
+            else:
+                estado["Deuda pendiente"] -= estado["Caja disponible"]
+                estado["Caja disponible"] = 0
     """
     2. Pagar deuda:
 
@@ -551,18 +483,11 @@ def finanzas_crear_fondo_emergencia(estado):
             estado["Caja disponible"] = 0
         estado["Fondo emergencia"] = True
         estado["contador_fondo_emergencia"] = 1
+    # sirve para bloquear cartas que den gastos inesperados
     """
-        4. Crear fondo de emergencia
-        - Si “Caja disponible” ≥ 50 000:
-            • Resta 50 000 de “Caja disponible”.
-            • Fija el flag “Fondo emergencia = True”.
-        - En otro caso, retorna sin cambios.
-        - Debes implementar una variable que represente tener un fondo de emergencia.
         - Esta accion bloquea diversas Cartas del Caos que involcuren gastos inesperaods (sin importar su costo)
             • Incluye el precio de mercadería perdida por robo, accidentes o siniestros
             • Incluye gastos logísticos por productos retirados del mercado o logística inversa.
-        - Si no hay dinero, debes pedir un préstamo al 12% de interes
-            • Es decir, adquieres el fondo de emergencia, y te haces una deuda de S/ 56,000
     """
 
     return estado

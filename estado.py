@@ -4,8 +4,6 @@ def calcular_estado_inicial():
     incluyendo todos los flags y contadores que luego se referencian en
     calcular_estado_final().
     """
-    empleados = 4
-    costo_emp = 2000
     precio_venta = 4.5
     return {
         # Indicadores financieros y operativos
@@ -15,9 +13,9 @@ def calcular_estado_inicial():
         "Pedidos por atender":               0,
         "Unidades vendidas":                 0,
         "Insumos disponibles":               100,
-        "Cantidad de empleados":             empleados,
-        "Costo por empleado":                costo_emp,
-        "Sueldos por pagar":                 empleados * costo_emp,
+        "Cantidad de empleados":             4,
+        "Costo por empleado":                2000,
+        "Sueldos por pagar":                 4 * 2000,
         "Deuda pendiente":                   20000,
         "Reputacion del mercado":            "Nivel 3",
         "Multas e indemnizaciones":          0,
@@ -40,9 +38,11 @@ def calcular_estado_inicial():
         "EcommerceActivo":                   False,
         "IncentivosActivos":                 False, # agregado por mi
         "InventarioMesAnterior":             0,
-        #contador de las cartas del caos
 
         # contadores agregados por mi
+        "registro de ventas":['a','b'],
+        "registro de ventas_precios": [0, 0],
+        "registro de ventas_indice": 0,
         "mejora_proceso":0,
         "duracion_demanda": 0,
         "competidores_nuevos": 0,
@@ -50,11 +50,14 @@ def calcular_estado_inicial():
         "contador_fondo_emergencia": 0,
         "Ventas": 0,  # vinculado al estado final
         "Subida de sueldo":0,
-        "bloqueador_clima":0,
-        "Registro_de_cambios":{}# usare esto de aca para revertir efectos de las acciones
+        "bloqueador_clima":0, # uso de registro para tener doble control sobre las cartas
+        "Cambios_carta":{"":3,"":4,"":3,"":2}# usare esto de aca para revertir efectos de las acciones
+        "contador_actual":{}
+        #
         "Registro_de_deudas(duracion)":{'a':0,'b':0,'c':0,'d':0}, # relacionado al credito de proveedores
         "Registro_de_deudas(cantidad)": {'a': 0, 'b': 0, 'c': 0, 'd': 0},
         "indice_deudas":0
+        #
     }
 
 def calcular_estado_final(estado):
@@ -189,31 +192,4 @@ def calcular_estado_final(estado):
          entonces, el excedente caduca (hasta completar el 10% que vence).
        - Puedes apoyarte de las variables "InventarioMesAnterior" e "Inventario"
     """
-    # 1) Venta automatica
-    estado["Inventario"]            = estado["Inventario"]
-    estado["Unidades vendidas"]     = estado["Unidades vendidas"]
-    estado["Caja disponible"]       = estado["Caja disponible"]
-
-    # 2) Actualizacion de pedidos por atender
-    estado["Pedidos por atender"]   = estado["Pedidos por atender"]
-    estado["Reputacion del mercado"] = estado["Reputacion del mercado"]
-
-    # 3) Pago de la nomina del mes actual
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
-    estado["Caja disponible"]       = estado["Caja disponible"]
-
-    # 4) Generacion de la nomina del proximo mes
-    estado["Sueldos por pagar"]     = estado["Sueldos por pagar"]
-
-    # 5) Anular multas, accidentes, y demas cartas del caos
-    estado["Prohibir Produccion"]   = estado["Prohibir Produccion"]
-
-    # 6) Produccion en automatico
-    estado["Inventario"]            = estado["Inventario"]
-
-    # 7) Actualizacion de flags temporales y decremento de contadores
-    estado["TurnosProduccionExtra"] = estado["TurnosProduccionExtra"]
-
-    # 8) Perdida de inventario:
-    estado["Inventario"]            = estado["Inventario"]
     return estado

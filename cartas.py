@@ -4,11 +4,18 @@ def aplicar_carta(numero, estado):
     if numero == 1:
         return estado
     elif numero == 2:
-        if estado["Maquinas (total/activas/dañadas)"].split()[-2]>=2:
-            estado["Maquinas (total/activas/dañadas)"]=str(estado["Maquinas (total/activas/dañadas)"].split()[0])+"/"+str(int(estado["Maquinas (total/activas/dañadas)"].split()[-2])-2)+"/"+str(int(estado["Maquinas (total/activas/dañadas)"].split()[-1])+2)
-        else:
-            estado["Maquinas (total/activas/dañadas)"] = str(
-                estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(0) + "/" + str((int(estado["Maquinas (total/activas/dañadas)"].split()[-1]) +int(estado["Maquinas (total/activas/dañadas)"].split()[-2])) )
+        if estado["Contador_mantenimiento"] == 0:
+            if estado["Maquinas (total/activas/dañadas)"].split()[-2] >= 2:
+                estado["Maquinas (total/activas/dañadas)"] = str(
+                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split()[-2]) - 2) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split()[-1]) + 2)
+            else:
+                estado["Maquinas (total/activas/dañadas)"] = str(
+                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(0) + "/" + str((int(
+                    estado["Maquinas (total/activas/dañadas)"].split()[-1]) + int(
+                    estado["Maquinas (total/activas/dañadas)"].split()[-2])))
+
         return estado
 
     # Carta 3: Virus informatico:
@@ -18,9 +25,13 @@ def aplicar_carta(numero, estado):
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     # Duración: 2 turnos
     elif numero == 3:
-        estado["r_produccion"]=2
-        estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split[-1]) - 1)  # creo que se deberia usar el temporizador de 2
-
+        if estado["bloqueador_seguridad"] == 0:
+            estado["r_insumos"] = 1
+            estado["r_produccion"] = 2
+            if int(estado["Reputacion del mercado"][-1]) >= 1:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 1)
+            elif int(estado["Reputacion del mercado"][-1]) < 1:
+                estado["Reputacion del mercado"] = "Nivel " + str(0)
         return estado
 
     # Carta 4: Incendio en almacen
@@ -30,69 +41,63 @@ def aplicar_carta(numero, estado):
         return estado
     elif numero == 5:
         estado["Multas e indemnizaciones"]+=5000
-        estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split[-1])-1)
+        if int(estado["Reputacion del mercado"][-1])>=1:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-1)
+        elif int(estado["Reputacion del mercado"][-1])<1:
+            estado["Reputacion del mercado"]="Nivel "+str(0)
+
         return estado
     #   - Tuvimos que reponer mercaderia equivalente a la demanda actual (elimina el inventario equivalente a la demanda)
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6:
-        estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split[-1]) - 2)
-        estado["uso_demanda"]=True # demanda de se debe calcular primero
+        if int(estado["Reputacion del mercado"][-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
+        elif int(estado["Reputacion del mercado"][-1])<2:
+            estado["Reputacion del mercado"]="Nivel "+str(0)
+
         estado["r_demanda"]+=50
         estado["duracion_6"]=2
 
         return estado
 
-    # Carta 7: Robo de insumos
-    #   - Pierdes 30% de insumos disponibles.
     elif numero == 7:
         estado["Insumos disponibles"]=round(estado["Insumos disponibles"]*0.7)
         return estado
-    # Carta 8: Fuga de talento clave
-    #   - Tras la fuga de talento, operarios sin experiencia manipularon y dañaron una maquina
-    #   - Pierdes 1 maquina activa (pasa a dañada).
-    #   - Pierdes 1 empleado.
     elif numero == 8:
-        if estado["Maquinas (total/activas/dañadas)"].split()[-2]>=1:
-            estado["Maquinas (total/activas/dañadas)"]=str(estado["Maquinas (total/activas/dañadas)"].split()[0])+"/"+str(int(estado["Maquinas (total/activas/dañadas)"].split()[-2])-1)+"/"+str(int(estado["Maquinas (total/activas/dañadas)"].split()[-1])+1)
-        if estado["Cantidad de empleados"]>=1:
-            estado["Cantidad de empleados"]-=1
+        if estado["Contador_mantenimiento"] == 0:
+            if estado["Maquinas (total/activas/dañadas)"].split()[-2] >= 1:
+                estado["Maquinas (total/activas/dañadas)"] = str(
+                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split()[-2]) - 1) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split()[-1]) + 1)
+        if estado["bloqueador_clima"]==0:
+            if estado["Cantidad de empleados"] >= 1:
+                estado["Cantidad de empleados"] -= 1
         return estado
-
-    # Carta 9: Huelga por ambiente laboral
-    #   - La proxima ronda no se produce.
-    #   - Los clientes se enteran de la huelga y baja la reputación 3 niveles
-    # Duración: 2 turnos
     elif numero == 9:
-        estado["r_sigProduccion"]=2
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
-            estado["Reputacion del mercado"]="Nivel "+str(0)
-
+        if estado["bloqueador_clima"] == 0:
+            estado["r_sigProduccion"] = 2
+            if int(estado["Reputacion del mercado"][-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
+            elif int(estado["Reputacion del mercado"][-1]) < 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(0)
         return estado
-
-    # Carta 10: Hacker secuestra datos
-    #   - Pierdes 5,000 de caja (si no alcanza, la diferencia se convierte en deuda al 12%)
-    #   - Reputacion baja 2 niveles
-    #   - Te aplican una multa de 5,000 soles por malas practicas de seguridad de la informacion
     elif numero == 10:
-        if estado["Caja disponible"]>=5000:
-            estado["Caja disponible"] -= 5000
-        else :
-            estado["Deuda pendiente"]+=(5000-estado["Caja disponible"])*1.12
-            estado["Caja disponible"] = 0
-        estado["Multas e indemnizaciones"] += 5000
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
-            estado["Reputacion del mercado"]="Nivel "+str(0)
+        if estado["contador_fondo_emergencia"] == 0:
+            if estado["Caja disponible"] >= 5000:
+                estado["Caja disponible"] -= 5000
+            else:
+                estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            estado["Multas e indemnizaciones"] += 5000
+            if int(estado["Reputacion del mercado"][-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
+            elif int(estado["Reputacion del mercado"][-1]) < 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(0)
 
         return estado
 
- # Carta 11: Multa ambiental
-    #   - Aumentan “Multas e indemnizaciones” en +5000.
-    #   - Reputacion del mercado −1 nivel.
     elif numero == 11:
         estado["Multas e indemnizaciones"] += 5000
         if int(estado["Reputacion del mercado"][-1])>=1:
@@ -114,40 +119,40 @@ def aplicar_carta(numero, estado):
     #     • Debes devolver el dinero obtenido por dichas ventas
     #     • Además, gastas 15,000 soles en la logística inversa
     # Duración: 3 turnos
-    elif numero == 13:
-        if estado["Caja disponible"] >= 15000:
-            estado["Caja disponible"] -= 15000
-        else:
-            estado["Deuda pendiente"] += (15000 - estado["Caja disponible"])*1.12
-            estado["Caja disponible"] = 0
+    elif numero == 13: # falta solucionar para que se ejecute en estado
+        if estado["contador_fondo_emergencia"] ==0:
+            if estado["Caja disponible"] >= 15000:
+                estado["Caja disponible"] -= 15000
+            else:
+                estado["Deuda pendiente"] += (15000 - estado["Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            if estado["Caja disponible"] >= estado["registro de ventas_precios"]:
+                estado["Caja disponible"] -= sum(estado["registro de ventas_precios"])
+            else:
+                estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
+                    "Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            return estado
 
-        return estado
-
-    # Carta 14: Retraso en importacion
-    #   - Prohibir insumos importados las siguientes 3 rondas:
     elif numero == 14:
-        estado["p_insumosIm"]=3
+        estado["p_insumosImportados"]=3
         return estado
 
-    # Carta 15: Proveedores en huelga
-    #   - Prohibir compras nacionales las siguientes 4 rondas:
     elif numero == 15:
-        estado["p_compras-int"]=4
+        estado["p_compras-nacionales"]=4
         return estado
 
-    # Carta 16: Estafa financiera
-    #   - Pierdes 8,000 de caja
     elif numero == 16:
-        if estado["Caja disponible"] >= 8000:
-            estado["Caja disponible"] -= 8000
-        else:
-            estado["Deuda pendiente"] += 8000 - estado["Caja disponible"]
-            estado["Caja disponible"] = 0
+        if estado["contador_fondo_emergencia"] ==0:
+
+            if estado["Caja disponible"] >= 8000:
+                estado["Caja disponible"] -= 8000
+            else:
+                estado["Deuda pendiente"] += 8000 - estado["Caja disponible"]
+                estado["Caja disponible"] = 0
 
         return estado
 
-    # Carta 17: Rumor de corrupcion
-    #   - Reputacion del mercado −2 niveles.
     elif numero == 17:
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
@@ -156,21 +161,15 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 18: Plaga en planta // reversion de acciones
-    #   - Produccion a la mitad este turno
-    # Duración: 3 turnos
     elif numero == 18:
         estado["d_produccion"]=3
         return estado
 
-    # Carta 19: Cliente corproativo VIP cancela pedido
-    #   - Peirdes un tercio de los “Pedidos por atender”.
     elif numero == 19:
-        estado["t_pedidos"]=True
+        if estado["bloqueador_campania"] ==0 or estado["duracion_demanda"] ==0:
+           estado["t_pedidos"]=1
         return estado
 
-    # Carta 20: Producto defectuoso viral
-    #   - Reputacion del mercado −3 niveles.
     elif numero == 20:
         if int(estado["Reputacion del mercado"][-1])>=3:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-3)
@@ -178,24 +177,15 @@ def aplicar_carta(numero, estado):
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
-
-    # Carta 21: Mal clima: inundacion
-    #   - No se produce la siguiente ronda:
-    # Duración: 2 turnos
     elif numero == 21:
-        estado["r_ronda-sig"]=2
+        estado["r_ronda-sig-producciojn"]=2
         return estado
 
-    # Carta 22: Licencia vencida
-    #   - Multas +30,000.
-    #   - Prohibir produccion la siguiente ronda.
     elif numero == 22:
         estado["Multas e indemnizaciones"] += 30000
-        estado["r_produccion"]=True
+        estado["r_produccion"]=1
         return estado
 
-    # Carta 23: Fake news en redes
-    #   - Reputacion del mercado −2 niveles.
     elif numero == 23:
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
@@ -204,15 +194,10 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 24: Bloqueo logistico // reversion de acciones
-    #   - No se venden unidades
-    # Duración: 2 turnos
     elif numero == 24:
         estado["r_venta"]=2
         return estado
 
-    # Carta 25: Demanda judicial
-    #   - Multas e indemnizaciones +15,000.
     elif numero == 25:
         estado["Multas e indemnizaciones"]+=15000
         return estado
@@ -222,51 +207,42 @@ def aplicar_carta(numero, estado):
     #   - Debemos pagar 5,000 por almacén
     # Duración: 3 turnos
 
-    elif numero == 26: # problema al definir ventas ya que no es una variable original
-        estado["r_venta40%"]=True
-        if estado["Caja disponible"] >= 5000:
-            estado["Caja disponible"] -= 5000
-        else:
-            estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
-            estado["Caja disponible"] = 0
-        estado["duracion_almacen"]=3
+    elif numero == 26:
+        if estado["competidores_nuevos"] ==0:
+            estado["r_venta40%"] = True
+            if estado["Caja disponible"] >= 5000:
+                estado["Caja disponible"] -= 5000
+            else:
+                estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+                estado["Caja disponible"] = 0
+            estado["duracion_almacen"] = 3
         return estado
 
-    # Carta 27: Robo interno
-    #   - Caja se reduce en 10,000.
     elif numero == 27:
-        if estado["Caja disponible"] >= 10000:
-            estado["Caja disponible"] -= 10000
-        else:
-            estado["Caja disponible"] = 0
+        if estado["bloqueador_seguridad"] ==0 or estado["contador_fondo_emergencia"] ==0:
+            if estado["Caja disponible"] >= 10000:
+                estado["Caja disponible"] -= 10000
+            else:
+                estado["Caja disponible"] = 0
 
         return estado
-
-    # Carta 28: Crisis economica
-    #   - Todos los costos +10% por los siguientes 5 turnos:
+    # costos
     elif numero == 28:
-        estado["aumento"]=5
+        estado["aumento_por 10%"]=5
         return estado
 
-    # Carta 29: Fuga de datos // reversion de acciones
-    #   - Reputacion del mercado −2 nivel.
-    #   - Ventas de este mes se reducen en un 75%
     elif numero == 29:
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
         elif int(estado["Reputacion del mercado"][-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
-        estado["r_75%"]=True
+        estado["d_ventas-75%"]=1
 
         return estado
 
-    # Carta 30: Huelga nacional // reversion de acciones
-    #   - No ventas ni produccion
-    #   - Debemos pagar 10,000 por almacén
-    # Duración: 3 turnos
     elif numero == 30:
-        estado["p_ventas,produccion"]=True
+        estado["p_ventas,produccion"]=3
         if estado["Caja disponible"] >= 10000:
             estado["Caja disponible"] -= 10000
         else:
@@ -274,11 +250,8 @@ def aplicar_carta(numero, estado):
             estado["Caja disponible"] = 0
         return estado
 
-    # Carta 31: Rechazo de exportacion // reversion de acciones
-    #   - Inventario acumulado (no se vende este mes).
-    #   - Debemos pagar 10,000 por almacén
     elif numero == 31:
-        estado["p_venta"]=True
+        estado["p_venta"]=1
         if estado["Caja disponible"] >= 10000:
             estado["Caja disponible"] -= 10000
         else:
@@ -287,21 +260,17 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 32: Error contable # reversion de acciones
-    #   - Caja −7000.
     elif numero == 32:
-        if estado["Caja disponible"] >= 7000:
-            estado["Caja disponible"] -= 7000
-        else:
-            estado["Caja disponible"] = 0
+        if estado["contador_fondo_emergencia"] == 0:
+            if estado["Caja disponible"] >= 7000:
+                estado["Caja disponible"] -= 7000
+            else:
+                estado["Caja disponible"] = 0
 
         return estado
 
-    # Carta 33: Error en codigo de barras // reversion de acciones
-    #   - No se venden productos este mes:
-    #   - reputación baja 2 niveles
     elif numero == 33:
-        estado["R_ventas"]=True
+        estado["R_ventas"]=1
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
         elif int(estado["Reputacion del mercado"][-1])<2:
@@ -309,12 +278,8 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 34: Mal diseño del empaque // reversion de las acciones
-    #   - Ventas −25%
-    #   - reputación baja 2 niveles
-    # Duración: 2 turnos
     elif numero == 34:
-        estado["carta34"]==2
+        estado["carta34"]=2
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
         else:
@@ -322,9 +287,6 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 35: Cliente se intoxica
-    #   - Reputacion del mercado −3 niveles.
-    #   - Multas +30,000.
     elif numero == 35:
         estado["Multas e indemnizaciones"] += 30000
         if int(estado["Reputacion del mercado"][-1])>=3:
@@ -334,49 +296,36 @@ def aplicar_carta(numero, estado):
 
         return estado
     elif numero == 36:
-        if estado["Caja disponible"] >= 15000:
-            estado["Caja disponible"] -= 15000
-        else:
-            estado["Deuda pendiente"] += 15000 - estado["Caja disponible"]
-            estado["Caja disponible"] = 0
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        else:
-            estado["Reputacion del mercado"]="Nivel "+str(0)
+        if estado["contador_fondo_emergencia"] ==0:
+            if estado["Caja disponible"] >= 15000:
+                estado["Caja disponible"] -= 15000
+            else:
+                estado["Deuda pendiente"] += 15000 - estado["Caja disponible"]
+                estado["Caja disponible"] = 0
+            if int(estado["Reputacion del mercado"][-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
+            else:
+                estado["Reputacion del mercado"] = "Nivel " + str(0)
 
-        estado["Deuda pendiente"] += 15000
-
+            estado["Deuda pendiente"] += 15000
         return estado
 
-    # Carta 37: Trabajador se accidenta // reversion de las acciones
-    #   - Multas +4000.
-    #   - Produccion −50% este mes
-    #   - Temporalmente -1 trabajador por 2 turnos
     elif numero == 37: # aplicacion de 50%
-        estado["Multas e indemnizaciones"]+=4000
-        estado["d_trabajador"]=2
+        if estado["bloqueador_seguridad"]== 0:
+            estado["Multas e indemnizaciones"] += 4000
+            estado["carta37"] = 2  # Produccion −50% este mes#   - Temporalmente -1 trabajador por 2 turnos
         return estado
 
-    # Carta 38: Derrame quimico // reversion de las acciones
-    #   - Inventario e Insumos = 0
-    #   - No puedes producir durante este mes y el siguiente
     elif numero == 38:
         estado["Inventario"],estado["Insumos Disponibles"]=0,0
         estado["r_producir"]=2
         return estado
 
-    # Carta 39: Virus contagioso // necesario una reversion de las acciones
-    #   Todos los empleados se quedaron en su casa por un mes
-    #   No se vende ni se produce
     elif numero == 39:
-        estado["r_produccion"]=True
+        estado["r_produccion"]=1
         return estado
-
-    # Carta 40: Hiring Freeze
-    #   No puedes contratar empleados nuevos
-    # Duración: 5 turnos
     elif numero == 40:
-        estado["r_contrato"]=5
+        estado["r_contrato-empleados"]=5
         return estado
     else:
         return estado

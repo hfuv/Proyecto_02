@@ -28,12 +28,12 @@ def aplicar_carta(numero, estado):
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     # Duración: 2 turnos
     elif numero == 3:
-        if estado["bloqueador_seguridad"] == 0:
+        if estado["bloqueador_seguridad"] == 0 :
             estado["r_insumos"] = 1
             estado["r_produccion"] = 2
-            if int(estado["Reputacion del mercado"][-1]) >= 1:
-                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 1)
-            elif int(estado["Reputacion del mercado"][-1]) < 1:
+            if int(estado["Reputacion del mercado"].split()[-1]) >= 1:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split()[-1]) - 1)
+            elif int(estado["Reputacion del mercado"].split()[-1]) < 1:
                 estado["Reputacion del mercado"] = "Nivel " + str(0)
         return estado
     # Carta 4: Incendio en almacen
@@ -48,9 +48,9 @@ def aplicar_carta(numero, estado):
     # Los clientes se enteraron y bajo la reputacion 1 nivel
     elif numero == 5:
         estado["Multas e indemnizaciones"]+=5000
-        if int(estado["Reputacion del mercado"][-1])>=1:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-1)
-        elif int(estado["Reputacion del mercado"][-1])<1:
+        if int(estado["Reputacion del mercado"].split()[-1])>=1:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-1)
+        elif int(estado["Reputacion del mercado"].split()[-1])<1:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -61,9 +61,9 @@ def aplicar_carta(numero, estado):
     #   - Luego, la demanda actual se reduce en 50%
     # Duración: 2 turnos
     elif numero == 6: # dudoso
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-2)
+        elif int(estado["Reputacion del mercado"].split()[-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         estado["r_demanda"]=50
@@ -100,9 +100,9 @@ def aplicar_carta(numero, estado):
     elif numero == 9: # listo
         if estado["bloqueador_clima"] == 0:
             estado["r_sigProduccion"] = 3
-            if int(estado["Reputacion del mercado"][-1]) >= 2:
-                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
-            elif int(estado["Reputacion del mercado"][-1]) < 2:
+            if int(estado["Reputacion del mercado"].split()[-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split()[-1]) - 2)
+            elif int(estado["Reputacion del mercado"].split()[-1]) < 2:
                 estado["Reputacion del mercado"] = "Nivel " + str(0)
         return estado
     # Carta 10: Hacker secuestra datos
@@ -117,9 +117,9 @@ def aplicar_carta(numero, estado):
                 estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
                 estado["Caja disponible"] = 0
             estado["Multas e indemnizaciones"] += 5000
-            if int(estado["Reputacion del mercado"][-1]) >= 2:
-                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
-            elif int(estado["Reputacion del mercado"][-1]) < 2:
+            if int(estado["Reputacion del mercado"].split()[-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split()[-1]) - 2)
+            elif int(estado["Reputacion del mercado"].split()[-1]) < 2:
                 estado["Reputacion del mercado"] = "Nivel " + str(0)
 
         return estado
@@ -130,8 +130,8 @@ def aplicar_carta(numero, estado):
     elif numero == 11:
         estado["Multas e indemnizaciones"] += 5000
         if int(estado["Reputacion del mercado"].split()[-1])>=1:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-1)
-        elif int(estado["Reputacion del mercado"][-1])<1:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-1)
+        elif int(estado["Reputacion del mercado"].split()[-1])<1:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -156,7 +156,7 @@ def aplicar_carta(numero, estado):
             else:
                 estado["Deuda pendiente"] += (15000 - estado["Caja disponible"]) * 1.12
                 estado["Caja disponible"] = 0
-            if estado["Caja disponible"] >= estado["registro de ventas_precios"]:
+            if estado["Caja disponible"] >= sum(estado["registro de ventas_precios"]):
                 estado["Caja disponible"] -= sum(estado["registro de ventas_precios"])
             else:
                 estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
@@ -192,9 +192,9 @@ def aplicar_carta(numero, estado):
     # Carta 17: Rumor de corrupcion
     #   - Reputacion del mercado −2 niveles.
     elif numero == 17:
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split().split()[-1])-2)
+        elif int(estado["Reputacion del mercado"].split()[-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -217,9 +217,9 @@ def aplicar_carta(numero, estado):
     # Carta 20: Producto defectuoso viral
     #   - Reputacion del mercado −3 niveles.
     elif numero == 20:
-        if int(estado["Reputacion del mercado"][-1])>=3:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-3)
-        elif int(estado["Reputacion del mercado"][-1])<3:
+        if int(estado["Reputacion del mercado"].split()[-1])>=3:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-3)
+        elif int(estado["Reputacion del mercado"].split()[-1])<3:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -242,9 +242,9 @@ def aplicar_carta(numero, estado):
     # Carta 23: Fake news en redes
     #   - Reputacion del mercado −2 niveles.
     elif numero == 23:
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-2)
+        elif int(estado["Reputacion del mercado"].split()[-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -299,9 +299,9 @@ def aplicar_carta(numero, estado):
     #   - Ventas de este mes se reducen en un 75%
 
     elif numero == 29: # listo
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-2)
+        elif int(estado["Reputacion del mercado"].split()[-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         estado["carta29"]= 75
@@ -350,9 +350,9 @@ def aplicar_carta(numero, estado):
 
     elif numero == 33: # listo
         estado["R_ventas"]=1
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
-        elif int(estado["Reputacion del mercado"][-1])<2:
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-2)
+        elif int(estado["Reputacion del mercado"].split()[-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
@@ -364,8 +364,8 @@ def aplicar_carta(numero, estado):
     elif numero == 34: # listo
         estado["carta34"]=2
         estado["carta34(valor)"]=25
-        if int(estado["Reputacion del mercado"][-1])>=2:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
+        if int(estado["Reputacion del mercado"].split()[-1])>=2:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-2)
         else:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
@@ -376,8 +376,8 @@ def aplicar_carta(numero, estado):
 
     elif numero == 35: # listo
         estado["Multas e indemnizaciones"] += 30000
-        if int(estado["Reputacion del mercado"][-1])>=3:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-3)
+        if int(estado["Reputacion del mercado"].split()[-1])>=3:
+            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-3)
         else:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
@@ -394,8 +394,8 @@ def aplicar_carta(numero, estado):
             else:
                 estado["Deuda pendiente"] += 15000 - estado["Caja disponible"]
                 estado["Caja disponible"] = 0
-            if int(estado["Reputacion del mercado"][-1]) >= 2:
-                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
+            if int(estado["Reputacion del mercado"].split()[-1]) >= 2:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split()[-1]) - 2)
             else:
                 estado["Reputacion del mercado"] = "Nivel " + str(0)
 

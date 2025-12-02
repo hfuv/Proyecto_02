@@ -202,7 +202,7 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
        estado["Inventario"]=0
 # carta 13
     if 0<estado["carta 13"]<=3:
-        if estado["Caja disponible"] >= estado["registro de ventas_precios"]:
+        if estado["Caja disponible"] >= sum(estado["registro de ventas_precios"]):
             estado["Caja disponible"] -= sum(estado["registro de ventas_precios"])
         else:
             estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
@@ -210,8 +210,9 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
             estado["Caja disponible"] = 0
 # carta 38
     if estado["r_producir"]==2:
-        estado["Inventario"]-=estado["contador_actual"]["antes_inventario"]
-        estado["Insumos"]+=estado["contador_actual"]["antes_insumos"]
+        estado["Inventario"], estado["Insumos Disponibles"] = 0, 0
+        """estado["Inventario"]-=estado["contador_actual"]["antes_inventario"]
+        estado["Insumos"]+=estado["contador_actual"]["antes_insumos"]"""
 # carta 19
     if estado["t_pedidos"]!=0:
         estado["Pedidos por atender"]=round(estado["Pedidos por atender"]*2/3)

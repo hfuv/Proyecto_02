@@ -126,7 +126,7 @@ def calcular_estado_final(estado):
        - Descontar Pedidos por atender’
        - Si no se atiende el total de la demanda, la 'Reputacion del mercado' se reduce un nivel """
 #2----------------------------------------------------
-    estado["Pedidos por atender"]=1000*int(estado["Reputacion del mercado"].split()[-1])
+    estado["Demanda"]=1000*int(estado["Reputacion del mercado"].split()[-1])
     if estado["BrandingActivo"]==True and estado["duracion_branding"]>0:
         estado["Demanda"]=estado["Demanda"]*1.1
         estado["duracion_branding"]-=1
@@ -140,6 +140,8 @@ def calcular_estado_final(estado):
         elif estado["DuracionRestante->Temporal"]==1:
             estado["Demanda"]=estado["Demanda"]+150000
             estado["DuracionRestante->Temporal"]-=1
+    if estado["duracion_6"]>0:
+        estado["Demanda"]=estado["Demanda"]-(estado["Demanda"]*estado["Demanda"]/100)
     """
     2) Actualizacion de pedidos por atender
        - Calcular la demanda del proximo mes a partir de:

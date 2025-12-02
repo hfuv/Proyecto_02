@@ -54,7 +54,7 @@ def aplicar_carta(numero, estado):
         elif int(estado["Reputacion del mercado"][-1])<2:
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
-        estado["r_demanda"]+=50
+        estado["r_demanda"]=50
         estado["duracion_6"]=2
 
         return estado
@@ -122,7 +122,7 @@ def aplicar_carta(numero, estado):
                     "Caja disponible"]) * 1.12
                 estado["Caja disponible"] = 0
         estado["carta 13"]=3
-            return estado
+        return estado
 
     elif numero == 14:
         estado["p_insumosImportados"]=3

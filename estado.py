@@ -40,7 +40,6 @@ def calcular_estado_inicial():
         "InventarioMesAnterior":             0,
 
         # contadores agregados por mi
-        "Insumos":0,
         "registro de ventas_precios": [0, 0],
         "registro de ventas_indice": 0,
         "mejora_proceso":0,
@@ -227,9 +226,9 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
     if estado["TurnosProduccionExtra"]>0:
         estado["Inventario"]+=estado["contador_actual"]["antes_inventario"]
 #7------------------------------------------------------
-    if round(estado["Insumos"]*0.1)>estado["contador_actual"]["antes_insumos"]:
-        estado["Insumos disponibles"]-=round(estado["Insumos"]*0.1)
-    if not(estado["Prohibir Produccion"]==False and estado["r_producir"]==0 and estado["r_produccion"]==0 and estado["r_insumos"]==0 and estado["r_sigProduccion"]==0 and estado["p_ventas,produccion"]==0):
+    if round(estado["Insumos disponibles"]*0.1)>estado["contador_actual"]["antes_insumos"]:
+        estado["Insumos disponibles"]-=round(estado["Insumos disponibles"]*0.1)
+    if estado["Prohibir Produccion"]==False and estado["r_producir"]==0 and estado["r_produccion"]==0 and estado["r_insumos"]==0 and estado["r_sigProduccion"]==0 and estado["p_ventas,produccion"]==0:
         estado["Insumos disponibles"] -= round(estado["Insumos disponibles"] * 0.1)
     if estado["EcommerceActivo"]==True:
         estado["Pedidos por atender"]+=5000

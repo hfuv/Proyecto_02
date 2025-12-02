@@ -249,7 +249,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 24: Bloqueo logistico /=/=/
+    # Carta 24: Bloqueo logistico
     #   - No se venden unidades
     # Duración: 2 turnos
     elif numero == 24: # listo
@@ -375,11 +375,12 @@ def aplicar_carta(numero, estado):
     #   - Multas +30,000.
 
     elif numero == 35: # listo
-        estado["Multas e indemnizaciones"] += 30000
-        if int(estado["Reputacion del mercado"].split()[-1])>=3:
-            estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"].split()[-1])-3)
-        else:
-            estado["Reputacion del mercado"]="Nivel "+str(0)
+        if estado["lanzar_campania"]==0:
+            estado["Multas e indemnizaciones"] += 30000
+            if int(estado["Reputacion del mercado"].split()[-1]) >= 3:
+                estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"].split()[-1]) - 3)
+            else:
+                estado["Reputacion del mercado"] = "Nivel " + str(0)
 
         return estado
     # Carta 36: Fraude en prestamo

@@ -233,9 +233,7 @@ def marketing_co_branding(estado):
         estado["Deuda pendiente"] += (3000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["contador_co-branding"]=2
-    estado["aumento_venta"]=20 #      (siempre y cuando exista inventario disponible para la venta).
-
-    # demanda extra temporal se activara de 300000 turno 1 y 100000 turno 2 y se debe restablecer si no se cumple
+    estado["aumento_venta"]=20
     return estado
 
 

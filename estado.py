@@ -56,7 +56,44 @@ def calcular_estado_inicial():
         "Registro_cambios37": {'a': 0, 'b': 0, 'c': 0},
         "indice_deudas(cambios)": 0,
         "aumento_por 10%":0,
-
+        "venta_excedente": 0,
+        "Contador_IP":0,
+        "aumento_venta":0,
+        "contador_co-branding":0,
+        "duracion_branding":0,
+        "bloqueador_campania":0,
+        "lanzar_campania":0,
+        "Contador_mantenimiento":0,
+        "bloqueador_seguridad":0,
+        "r_produccion":0,
+        "r_insumos":0,
+        "perdida":False,
+        "duracion_6":0,
+        "r_demanda":0,
+        "r_sigProduccion":0,
+        "R-12(duracion)":0,
+        "R-12":0,
+        "carta 13":0,
+        "p_insumosImportados":0,
+        "p_compras-nacionales":0,
+        "d_produccion":0,
+        "18":False,
+        "t_pedidos":0,
+        "r_ronda-sig-producciojn":0,
+        "r_venta":0,
+        "r_venta40%":False,
+        "duracion_almacen":0,
+        "carta 26":0,
+        "carta29":0,
+        "p_ventas,produccion":0,
+        "p_venta":0,
+        "R_ventas":0,
+        "carta34(valor)":0,
+        "carta34":0,
+        "carta37":0,
+        "37":False,
+        "r_producir":0,
+        "r_contrato-empleados":0,
         #
         "Registro_de_deudas(duracion)":{'a':0,'b':0,'c':0,'d':0}, # relacionado al credito de proveedores
         "Registro_de_deudas(cantidad)": {'a': 0, 'b': 0, 'c': 0, 'd': 0},
@@ -82,6 +119,8 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
     #----------------------------------------------------------------------------------------
 
     #1-------------------
+    if estado["contador_co-branding"]>0 and estado["Inventario"] > estado["Pedidos por atender"]*1.2:
+        estado["Pedidos por atender"]=round(estado["Pedidos por atender"]*1.2)
     if estado["R_ventas"]==0 and estado["p_venta"]==0 and estado["p_ventas,produccion"]==0 and estado["r_venta"]==0:
         r=(100-(estado["carta34(valor)"]+estado["carta29"]+estado["carta 26"]+estado["R-12"]))
         if r <0:
@@ -119,6 +158,7 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
         estado["Reputacion del mercado"]="Nivel"+" "+ str(int(estado["Reputacion del mercado"].split()[-1])-1)
 #2----------------------------------------------------
     estado["Demanda"]=1000*int(estado["Reputacion del mercado"].split()[-1])
+
     if estado["BrandingActivo"]==True and estado["duracion_branding"]>0:
         estado["Demanda"]=estado["Demanda"]*1.1
         estado["duracion_branding"]-=1
@@ -126,12 +166,15 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
         estado["Demanda"]=estado["Demanda"]+5000
         estado["duracion_ecommerce"] -=1
     if estado["DemandaExtraTemporal"]==True:
-        if estado["DuracionRestante->Temporal"]==2:
+        if estado["contador_co-branding"]==2:
             estado["Demanda"]=estado["Demanda"]+300000
-            estado["DuracionRestante->Temporal"]-=1
-        elif estado["DuracionRestante->Temporal"]==1:
+            estado["contador_co-branding"]-=1
+        elif estado["contador_co-branding"]==1:
             estado["Demanda"]=estado["Demanda"]+150000
-            estado["DuracionRestante->Temporal"]-=1
+            estado["contador_co-branding"]-=1
+    if estado["Contador_IP"] >0:
+        estado["Contador_IP"]-=1
+        estado["Demanda"] = estado["Demanda"]*1.5
     if estado["duracion_6"]>0: # dudoso
         estado["Demanda"]=estado["Demanda"]-(estado["Demanda"]*estado["r_demanda"]/100)
     estado["Pedidos por atender"]=estado["Demanda"]
@@ -190,7 +233,7 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
     if estado["EcommerceActivo"]==True:
         estado["Pedidos por atender"]+=5000
         if estado["Insumos disponibles"]>0:
-            estado["Ventas"] += 2000
+            estado["Demanda"] += 2000
     if estado["TurnosProduccionExtra"]==0:
        estado["TurnosProduccionExtra"] = 0
     elif estado["TurnosProduccionExtra"]!=0:
@@ -207,14 +250,102 @@ def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la v
     estado["BrandingActivo"]= False
     estado["MantenimientoHecho"]=False
     estado["EcommerceActivo"]= False
-    """
-    
-    7) Actualizacion de flags temporales y decremento de contadores
-       - Reducir en 1 las variables contadoras. Por ejemplo:
-         • ‘TurnosProduccionExtra’
-         • ‘DemandaExtraTemporal’
-         • ‘EmpleadosTemporales’
-         • Duracion de ‘MejoraProceso’, ‘BrandingActivo’, ‘MantenimientoHecho’, etc.
-       - Desactivar (poner a False o 0) cualquier flag cuyo contador llegue a cero
-    """
+    if estado["contador_fondo_emergencia"]>0:
+        estado["contador_fondo_emergencia"]-=1
+        estado["Fondo emergencia"] = False
+    if estado["venta_excedente"] > 0:
+        estado["venta_excedente"] -= 1
+    if estado["contador_co-branding"]>0:
+        estado["contador_co-branding"]-=1
+    elif estado["contador_co-branding"]==0:
+        estado["aumento_venta"]=0
+    if estado["duracion_ecommerce"] >0:
+        estado["duracion_ecommerce"]-=1
+    if estado["duracion_demanda"]>0:
+        estado["duracion_demanda"]-=1
+    if estado["competidores_nuevos"] :
+        estado["competidores_nuevos"]-=1
+    if estado["duracion_branding"]>0:
+        estado["duracion_branding"]-=1
+    elif estado["duracion_branding"]==0:
+        estado["BrandingActivo"] = False
+    if estado["lanzar_campania"]>0:
+        estado["lanzar_campania"]-=1
+    if estado["bloqueador_campania"]>0:
+        estado["bloqueador_campania"]-=1
+    if estado["bloqueador_seguridad"]>0:
+        estado["bloqueador_seguridad"]-=1
+    if estado["bloqueador_clima"]>0:
+        estado["bloqueador_clima"]-=1
+    if estado["IncentivosActivos"]>0:
+        estado["IncentivosActivos"]-=1
+    if estado["Contador_mantenimiento"]>0:
+        estado["Contador_mantenimiento"]-=1
+    elif estado["Contador_mantenimiento"]==0:
+        estado["MantenimientoHecho"]=False
+    if estado["TurnosProduccionExtra"]>0:
+        estado["TurnosProduccionExtra"]-=1
+    if estado["r_produccion"]>0:
+        estado["r_produccion"]-=1
+    if estado["r_insumos"]>0:
+        estado["r_insumos"]-=1
+    if estado["perdida"] :
+        estado["perdida"]=False
+        estado["Inventario"]=0
+    if estado["duracion_6"]>0:
+        estado["duracion_6"]-=1
+    elif estado["duracion_6"]==0:
+        estado["r_demanda"] =0
+    if estado["r_sigProduccion"] >0:
+        estado["r_sigProduccion"]-=1
+    if estado["R-12(duracion)"]>0:
+        estado["R-12(duracion)"]-=1
+    elif estado["R-12(duracion)"]==0:
+        estado["R-12"] = 0
+    if estado["carta 13"]>0:
+        estado["carta 13"]-=1
+    if estado["p_insumosImportados"]>0:
+        estado["p_insumosImportados"]-=1
+    if estado["p_compras-nacionales"]>0:
+        estado["p_compras-nacionales"]-=1
+    if estado["d_produccion"]>0:
+        estado["d_produccion"]-=1
+    elif estado["d_produccion"]==0:
+        estado["18"] = False
+    if estado["r_venta"]>0:
+        estado["r_venta"]-=1
+    if estado["r_produccion"]>0:
+        estado["r_produccion"]-=1
+    if estado["r_ronda-sig-producciojn"]>0:
+        estado["r_ronda-sig-producciojn"]-=1
+    if estado["t_pedidos"]>0:
+        estado["t_pedidos"]-=1
+    if estado["duracion_almacen"]>0:
+        estado["duracion_almacen"]-=1
+    elif estado["duracion_almacen"]==0:
+        estado["r_venta40%"] = False
+        estado["carta 26"] = 0
+    if estado["aumento_por 10%"]>0:
+        estado["aumento_por 10%"]-=1
+    estado["carta29"]=0
+    if estado["p_ventas,produccion"]>0:
+        estado["p_ventas,produccion"]-=1
+    if estado["p_venta"]>0:
+        estado["p_venta"]-=1
+    if estado["R_ventas"]>0:
+        estado["R_ventas"]-=1
+    if estado["carta34"]>0:
+        estado["carta34"]-=1
+    elif estado["carta34"]==0:
+        estado["carta34(valor)"]=0
+    if estado["carta37"]>0:
+        estado["carta37"]-=1
+    elif estado["carta37"]==0:
+        estado["37"]=False
+    if estado["r_producir"]>0:
+        estado["r_producir"]-=1
+    if estado["r_produccion"]>0:
+        estado["r_produccion"]-=1
+    if estado["r_contrato-empleados"]>0:
+        estado["r_contrato-empleados"]-=1
     return estado

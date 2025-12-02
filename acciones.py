@@ -11,7 +11,9 @@ def produccion_producir(estado): # llamar al diccionario para la reconstruccion 
         r=1.2
     d=estado["Prohibir Produccion"]==False and estado["r_producir"]==0
     q=estado["r_produccion"]==0 and estado["r_insumos"]==0
-    if d and q and estado["p_ventas,produccion"]==0:
+    xt=estado["r_sigProduccion"]==0
+    if  d and q and  estado["p_ventas,produccion"]==0 and xt:
+        estado["Insumos"]=estado["Insumos disponibles"]
         for a in range(1,int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2])+1):
             if f>=1:
                 if estado["Insumos disponibles"] >= 40000* f * 0.9:
@@ -60,7 +62,7 @@ def produccion_mantenimiento_maquinaria(estado):
 
 def produccion_comprar_nueva_maquina(estado):
     we=1
-    if estado["aumento_por 10%"]>5:
+    if estado["aumento_por 10%"]>0:
         we=1.1
     if estado["Caja disponible"]>10000*we:
         estado["Caja disponible"]-=10000*we
@@ -83,7 +85,7 @@ def rh_contratar_personal_permanente(estado):
 
 def rh_contratar_personal_temporal(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] > 10000*we:
@@ -97,7 +99,7 @@ def rh_contratar_personal_temporal(estado):
 
 def rh_implementar_incentivos(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
     if estado["Caja disponible"] >= 5000*we:
         estado["Caja disponible"] -= 5000*we
@@ -139,7 +141,7 @@ def rh_no_hacer_nada(estado):
 
 def marketing_lanzar_campania(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 8000*we:
@@ -161,7 +163,7 @@ def marketing_lanzar_campania(estado):
 
 def marketing_invertir_branding(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 12000*we:
@@ -179,7 +181,7 @@ def marketing_invertir_branding(estado):
 
 def marketing_estudio_mercado(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 5000*we:
@@ -195,7 +197,7 @@ def marketing_estudio_mercado(estado):
 
 def marketing_abrir_ecommerce(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
     if estado["EcommerceActivo"] == False:
         if estado["Caja disponible"] >= 20000*we:
@@ -222,7 +224,7 @@ def marketing_abrir_ecommerce(estado):
 
 def marketing_co_branding(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 3000*we:
@@ -245,7 +247,7 @@ def marketing_no_hacer_nada(estado):
 
 def compras_comprar_insumos_nacionales(estado): # indice se desplaza en estado final
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["p_compras-nacionales"]==0:
@@ -285,7 +287,7 @@ def compras_comprar_insumos_nacionales(estado): # indice se desplaza en estado f
 
 def compras_comprar_insumos_importados(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Activacion_descuento"] == True:
@@ -304,7 +306,7 @@ def compras_comprar_insumos_importados(estado):
 
 def compras_comprar_insumos_importados_premium(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["p_insumosImportados"]!=0:
@@ -332,7 +334,7 @@ def compras_vender_excedentes_insumos(estado):
 
 def compras_negociar_precio(estado):
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 5000*we:
@@ -341,12 +343,12 @@ def compras_negociar_precio(estado):
         estado["Deuda pendiente"] += (5000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["Activacion_descuento"]=True
-    estado["Descuento_compra"]=0.7
+    estado["Descuento_compra"]=0.3
     return estado
 
 def compras_negociar_credito(estado): # falta ajustar
     we = 1
-    if estado["aumento_por 10%"] > 5:
+    if estado["aumento_por 10%"] > 0:
         we = 1.1
 
     if estado["Caja disponible"] >= 2000*we:

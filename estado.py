@@ -40,6 +40,7 @@ def calcular_estado_inicial():
         "InventarioMesAnterior":             0,
 
         # contadores agregados por mi
+        "Insumos":0,
         "registro de ventas_precios": [0, 0],
         "registro de ventas_indice": 0,
         "mejora_proceso":0,
@@ -63,7 +64,7 @@ def calcular_estado_inicial():
         #
     }
 
-def calcular_estado_final(estado):
+def calcular_estado_final(estado): # falta usar estado["r_produccion"] para la venta
     # funcion agregada por mi para multi deudas
     for s, d in estado["Registro_de_deudas(duracion)"].items():
        if d != 0:
@@ -81,11 +82,11 @@ def calcular_estado_final(estado):
     #----------------------------------------------------------------------------------------
 
     #1-------------------
-    if estado["R_ventas"]==0 and estado["p_venta"]==0 and estado["p_ventas,produccion"]==0:
-        r=(100-estado["carta34"]+estado["carta29"]+estado["carta 26"]+estado["R-12"])
+    if estado["R_ventas"]==0 and estado["p_venta"]==0 and estado["p_ventas,produccion"]==0 and estado["r_venta"]==0:
+        r=(100-(estado["carta34(valor)"]+estado["carta29"]+estado["carta 26"]+estado["R-12"]))
         if r <0:
             r=0
-        if estado["descuento de venta"] == False:
+        if r==100:
             while estado["Inventario"] > 0:
                 if estado["Pedidos por atender"] > 0:
                     estado["Pedidos por atender"] -= 1
@@ -116,16 +117,6 @@ def calcular_estado_final(estado):
         estado["registro de ventas_indice"]=0
     if estado["Pedidos por atender"]>0:
         estado["Reputacion del mercado"]="Nivel"+" "+ str(int(estado["Reputacion del mercado"].split()[-1])-1)
-    """
-    Aplica las formulas de calculo al final de cada turno (mes) en el siguiente orden:
-
-    1) Venta automatica
-       - El precio de venta se debe cargar de la función calcular_estado_inicial()
-       - Vender hasta ‘Pedidos por atender’, descontar de ‘Inventario’
-       - Sumar ingresos a ‘Caja disponible’
-       - Incrementar ‘Unidades vendidas’
-       - Descontar Pedidos por atender’
-       - Si no se atiende el total de la demanda, la 'Reputacion del mercado' se reduce un nivel """
 #2----------------------------------------------------
     estado["Demanda"]=1000*int(estado["Reputacion del mercado"].split()[-1])
     if estado["BrandingActivo"]==True and estado["duracion_branding"]>0:
@@ -141,48 +132,18 @@ def calcular_estado_final(estado):
         elif estado["DuracionRestante->Temporal"]==1:
             estado["Demanda"]=estado["Demanda"]+150000
             estado["DuracionRestante->Temporal"]-=1
-    if estado["duracion_6"]>0:
-        estado["Demanda"]=estado["Demanda"]-(estado["Demanda"]*estado["Demanda"]/100)
-    """
-    2) Actualizacion de pedidos por atender
-       - Calcular la demanda del proximo mes a partir de:
-         • ‘Reputacion del mercado’
-         • Flags permanentes (p. ej. ‘BrandingActivo’, ‘EcommerceActivo’)
-         • Incrementos temporales (‘DemandaExtraTemporal’)
-       - Almacenar en ‘Pedidos por atender’
-       - Fórmula para calcular pedidos nuevos es: 1,000 x (nivel de reputación)
-       - Recuerde que el Branding activo aumenta la demanda en 10%
-       - Recuerde que tener un e-commerce aumenta la demanda en 5,000 unidades al mes
-    (no hay xd)   - Recurde que la campaña promocional aumenta la demanda en 4,000 unidades al mes
-       - Recuerde que el cobranding con una marca o influencer popular ocasiona:
-        • Una demanda temporal de 300,000 solo por el primer mes (luego desaparece)
-        • Una demanda temporal de 150,000 solo por el segundo mes  (luego desaparece)
-    """
+    if estado["duracion_6"]>0: # dudoso
+        estado["Demanda"]=estado["Demanda"]-(estado["Demanda"]*estado["r_demanda"]/100)
+    estado["Pedidos por atender"]=estado["Demanda"]
 #3-------------------------------------
     if estado ["Caja disponible"] >= estado["Sueldos por pagar"]:
            estado["Caja disponible"]-=estado["Sueldos por pagar"]
     elif estado["Caja disponible"] < estado["Sueldos por pagar"]:
            estado["Deuda pendiente"]+=(estado["Sueldos por pagar"]-estado["Caja disponible"])*1.12
            estado["Caja disponible"]=0
-    """
-    3) Pago de la nomina del mes actual
-       - Tomar ‘Sueldos por pagar’
-       - Si ‘Caja disponible’ ≥ ‘Sueldos por pagar’:
-           • Restar de ‘Caja disponible’
-         Sino:
-           • Calcula cuanto es lo que falta pagar (‘Sueldos por pagar’ – ‘Caja disponible’)
-           • Generar deuda con el 12% de interes total.
-           • Poner ‘Caja disponible’ = 0
-    """
 #4----------------------------------------------
-#esta ya escrito en la parte inicial
-    """
-       4) Generacion de la nomina del proximo mes
-       - Calcular ‘Sueldos por pagar’ en base a la cantidad de empleados
-           • No se toma en cuenta a los empleados temporales porque a ellos ya se les pago al contratarlos.
-     """
-#5-------------------------------------------------
-#me falta programar las cartas
+    estado["Sueldos por pagar"]=estado["Cantidad de empleados"]*estado["Costo por empleado"]
+#5------------------------------------------------
     # carta 37
     if estado["indice_deudas(cambios)"]<=0:
         estado["indice_deudas(cambios)"]+=1
@@ -190,40 +151,42 @@ def calcular_estado_final(estado):
     elif estado["indice_deudas(cambios)"]==2:
         estado["Cantidad de empleados"]+=1
         estado["indice_deudas(cambios)"]=0
-    if estado["37"]==True: # "contador_actual":{"antes_empleados":0,"antes_inventario":0,"antes_insumos":0},
+    if estado["37"]==True or estado["18"]==True: # "contador_actual":{"antes_empleados":0,"antes_inventario":0,"antes_insumos":0},
         estado["Inventario"]-=(estado["contador actual"]["antes_inventario"])/2
         estado["Insumos disponibles"]+=(estado["contador actual"]["antes_insumos"]/2)
 # carta 4
     if estado["perdida"]==True:
        estado["Inventario"]=0
 # carta 13
-    if 0<estado["carta 13"]<=2:
-        if estado["Caja disponible"] >= 15000:
-            estado["Caja disponible"] -= 15000
-        else:
-            estado["Deuda pendiente"] += (15000 - estado["Caja disponible"]) * 1.12
-            estado["Caja disponible"] = 0
+    if 0<estado["carta 13"]<=3:
         if estado["Caja disponible"] >= estado["registro de ventas_precios"]:
             estado["Caja disponible"] -= sum(estado["registro de ventas_precios"])
         else:
             estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
                 "Caja disponible"]) * 1.12
             estado["Caja disponible"] = 0
-
-    """""
-       5) Anular multas, accidentes, y demas cartas del caos
-       - Esto dependera de la carta del caos que haya salido, y de los flags que tengas activos.
-    """
-
+# carta 38
+    if estado["r_producir"]==2:
+        estado["Inventario"]-=estado["contador_actual"]["antes_inventario"]
+        estado["Insumos"]+=estado["contador_actual"]["antes_insumos"]
+# carta 19
+    if estado["t_pedidos"]!=0:
+        estado["Pedidos por atender"]=round(estado["Pedidos por atender"]*2/3)
+    if estado["Caja disponible"] >= estado["Multas e indemnizaciones"]:
+        estado["Caja disponible"] -=estado["Multas e indemnizaciones"]
+        estado["Multas e indemnizaciones"]=0
+    else:
+        estado["Deuda pendiente"] += (estado["Multas e indemnizaciones"] - estado["Caja disponible"]) * 1.12
+        estado["Caja disponible"] = 0
 #6-----------------------------------------------------
 #no entiendo como usar
-    """
-    6) Produccion en automatico
-       - Si ‘TurnosProduccionExtra’ > 0:
-         • Se produce en automatico la misma cantidad del turno anterior (sin gastar insumos).
-         • No debes disminuir ‘TurnosProduccionExtra’ porque dicho valor se reduce en el punto 7)
-    """
+    if estado["TurnosProduccionExtra"]>0:
+        estado["Inventario"]+=estado["contador_actual"]["antes_inventario"]
 #7------------------------------------------------------
+    if round(estado["Insumos"]*0.1)>estado["contador_actual"]["antes_insumos"]:
+        estado["Insumos disponibles"]-=round(estado["Insumos"]*0.1)
+    if not(estado["Prohibir Produccion"]==False and estado["r_producir"]==0 and estado["r_produccion"]==0 and estado["r_insumos"]==0 and estado["r_sigProduccion"]==0 and estado["p_ventas,produccion"]==0):
+        estado["Insumos disponibles"] -= round(estado["Insumos disponibles"] * 0.1)
     if estado["EcommerceActivo"]==True:
         estado["Pedidos por atender"]+=5000
         if estado["Insumos disponibles"]>0:
@@ -253,13 +216,5 @@ def calcular_estado_final(estado):
          • ‘EmpleadosTemporales’
          • Duracion de ‘MejoraProceso’, ‘BrandingActivo’, ‘MantenimientoHecho’, etc.
        - Desactivar (poner a False o 0) cualquier flag cuyo contador llegue a cero
-    """
-
-    """
-    8) Perdida de inventario:
-       - Los meses que no se produce nada, el 10% de insumos caduca.
-       - Si la produccion de este mes uso menos inventario que el 10% disponible,
-         entonces, el excedente caduca (hasta completar el 10% que vence).
-       - Puedes apoyarte de las variables "InventarioMesAnterior" e "Inventario"
     """
     return estado

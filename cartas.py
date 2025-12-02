@@ -5,16 +5,16 @@ def aplicar_carta(numero, estado):
         return estado
     elif numero == 2:
         if estado["Contador_mantenimiento"] == 0:
-            if estado["Maquinas (total/activas/dañadas)"].split()[-2] >= 2:
+            if estado["Maquinas (total/activas/dañadas)"].split("/")[-2] >= 2:
                 estado["Maquinas (total/activas/dañadas)"] = str(
-                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(
-                    int(estado["Maquinas (total/activas/dañadas)"].split()[-2]) - 2) + "/" + str(
-                    int(estado["Maquinas (total/activas/dañadas)"].split()[-1]) + 2)
+                    estado["Maquinas (total/activas/dañadas)"].split("/")[0]) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2]) - 2) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split("/")[-1]) + 2)
             else:
                 estado["Maquinas (total/activas/dañadas)"] = str(
-                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(0) + "/" + str((int(
-                    estado["Maquinas (total/activas/dañadas)"].split()[-1]) + int(
-                    estado["Maquinas (total/activas/dañadas)"].split()[-2])))
+                    estado["Maquinas (total/activas/dañadas)"].split("/")[0]) + "/" + str(0) + "/" + str((int(
+                    estado["Maquinas (total/activas/dañadas)"].split("/")[-1]) + int(
+                    estado["Maquinas (total/activas/dañadas)"].split("/")[-2])))
 
         return estado
 
@@ -39,10 +39,7 @@ def aplicar_carta(numero, estado):
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
-    #   - Tuvimos que reponer mercaderia equivalente a la demanda actual (elimina el inventario equivalente a la demanda)
-    #   - Luego, la demanda actual se reduce en 50%
-    # Duración: 2 turnos
-    elif numero == 6:
+    elif numero == 6: # dudoso
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
         elif int(estado["Reputacion del mercado"][-1])<2:
@@ -58,18 +55,18 @@ def aplicar_carta(numero, estado):
         return estado
     elif numero == 8:
         if estado["Contador_mantenimiento"] == 0:
-            if estado["Maquinas (total/activas/dañadas)"].split()[-2] >= 1:
+            if estado["Maquinas (total/activas/dañadas)"].split("/")[-2] >= 1:
                 estado["Maquinas (total/activas/dañadas)"] = str(
-                    estado["Maquinas (total/activas/dañadas)"].split()[0]) + "/" + str(
-                    int(estado["Maquinas (total/activas/dañadas)"].split()[-2]) - 1) + "/" + str(
-                    int(estado["Maquinas (total/activas/dañadas)"].split()[-1]) + 1)
+                    estado["Maquinas (total/activas/dañadas)"].split("/")[0]) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2]) - 1) + "/" + str(
+                    int(estado["Maquinas (total/activas/dañadas)"].split("/")[-1]) + 1)
         if estado["bloqueador_clima"]==0:
             if estado["Cantidad de empleados"] >= 1:
                 estado["Cantidad de empleados"] -= 1
         return estado
-    elif numero == 9:
+    elif numero == 9: # listo
         if estado["bloqueador_clima"] == 0:
-            estado["r_sigProduccion"] = 2
+            estado["r_sigProduccion"] = 3
             if int(estado["Reputacion del mercado"][-1]) >= 2:
                 estado["Reputacion del mercado"] = "Nivel " + str(int(estado["Reputacion del mercado"][-1]) - 2)
             elif int(estado["Reputacion del mercado"][-1]) < 2:
@@ -98,7 +95,7 @@ def aplicar_carta(numero, estado):
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
-    elif numero == 12:
+    elif numero == 12: # listo
         estado["R-12"]=50
         estado["R-12(duracion)"]=2
         return estado
@@ -115,15 +112,15 @@ def aplicar_carta(numero, estado):
                 estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
                     "Caja disponible"]) * 1.12
                 estado["Caja disponible"] = 0
-        estado["carta 13"]=3
+            estado["carta 13"]=3
         return estado
 
     elif numero == 14:
-        estado["p_insumosImportados"]=3
+        estado["p_insumosImportados"]=4
         return estado
 
     elif numero == 15:
-        estado["p_compras-nacionales"]=4
+        estado["p_compras-nacionales"]=5
         return estado
 
     elif numero == 16:
@@ -145,11 +142,12 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 18:
+    elif numero == 18: # listo
+        estado["18"] = True
         estado["d_produccion"]=3
         return estado
 
-    elif numero == 19:
+    elif numero == 19: # listo
         if estado["bloqueador_campania"] ==0 or estado["duracion_demanda"] ==0:
            estado["t_pedidos"]=1
         return estado
@@ -161,11 +159,11 @@ def aplicar_carta(numero, estado):
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
-    elif numero == 21:
+    elif numero == 21: # listo
         estado["r_ronda-sig-producciojn"]=2
         return estado
 
-    elif numero == 22:
+    elif numero == 22: # listo
         estado["Multas e indemnizaciones"] += 30000
         estado["r_produccion"]=1
         return estado
@@ -178,21 +176,15 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 24: # falta
+    elif numero == 24: # listo
         estado["r_venta"]=2
         return estado
 
     elif numero == 25:
         estado["Multas e indemnizaciones"]+=15000
         return estado
-
-    # Carta 26: Nuevo competidor agresivo // reversion de acciones
-    #   - Ventas −40%:
-    #   - Debemos pagar 5,000 por almacén
-    # Duración: 3 turnos
-
-    elif numero == 26:
-        if estado["competidores_nuevos"] ==0:
+    elif numero == 26: #listo
+        if estado["competidores_nuevos"] ==0: #
             estado["r_venta40%"] = True
             if estado["Caja disponible"] >= 5000:
                 estado["Caja disponible"] -= 5000
@@ -212,11 +204,11 @@ def aplicar_carta(numero, estado):
 
         return estado
     # costos
-    elif numero == 28:
+    elif numero == 28: # listo
         estado["aumento_por 10%"]=5
         return estado
 
-    elif numero == 29:
+    elif numero == 29: # listo
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
         elif int(estado["Reputacion del mercado"][-1])<2:
@@ -226,7 +218,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 30:
+    elif numero == 30: # listo
         estado["p_ventas,produccion"]=3
         if estado["Caja disponible"] >= 10000:
             estado["Caja disponible"] -= 10000
@@ -235,7 +227,7 @@ def aplicar_carta(numero, estado):
             estado["Caja disponible"] = 0
         return estado
 
-    elif numero == 31:
+    elif numero == 31: # listo
         estado["p_venta"]=1
         if estado["Caja disponible"] >= 10000:
             estado["Caja disponible"] -= 10000
@@ -254,7 +246,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 33:
+    elif numero == 33: # listo
         estado["R_ventas"]=1
         if int(estado["Reputacion del mercado"][-1])>=2:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-2)
@@ -263,7 +255,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 34:
+    elif numero == 34: # listo
         estado["carta34"]=2
         estado["carta34(valor)"]=25
         if int(estado["Reputacion del mercado"][-1])>=2:
@@ -273,7 +265,7 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    elif numero == 35:
+    elif numero == 35: # listo
         estado["Multas e indemnizaciones"] += 30000
         if int(estado["Reputacion del mercado"][-1])>=3:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-3)
@@ -281,7 +273,7 @@ def aplicar_carta(numero, estado):
             estado["Reputacion del mercado"]="Nivel "+str(0)
 
         return estado
-    elif numero == 36:
+    elif numero == 36: # listo
         if estado["contador_fondo_emergencia"] ==0:
             if estado["Caja disponible"] >= 15000:
                 estado["Caja disponible"] -= 15000
@@ -296,7 +288,7 @@ def aplicar_carta(numero, estado):
             estado["Deuda pendiente"] += 15000
         return estado
 
-    elif numero == 37:
+    elif numero == 37 : # listo solo verificar
         s=['a','b','c']
         if estado["bloqueador_seguridad"]== 0:
             estado["Multas e indemnizaciones"] += 4000
@@ -307,7 +299,7 @@ def aplicar_carta(numero, estado):
             estado["37"]=True
         return estado
 
-    elif numero == 38:
+    elif numero == 38: # listo
         estado["Inventario"],estado["Insumos Disponibles"]=0,0
         estado["r_producir"]=2
         return estado
@@ -315,7 +307,7 @@ def aplicar_carta(numero, estado):
     elif numero == 39:
         estado["r_produccion"]=1
         return estado
-    elif numero == 40:
+    elif numero == 40: # listo
         estado["r_contrato-empleados"]=5
         return estado
     else:

@@ -18,12 +18,6 @@ def aplicar_carta(numero, estado):
 
         return estado
 
-    # Carta 3: Virus informatico:
-    # Se pierde visibilidad del inventario y de los insumos por 1 turno
-    # No puedes producir porque no sabes cuantos insumos hay.
-    # No puedes vender porque no sabes cuanto invnetario hay.
-    # Los clientes se enteraron y bajo la reputacion 1 nivel
-    # Duración: 2 turnos
     elif numero == 3:
         if estado["bloqueador_seguridad"] == 0:
             estado["r_insumos"] = 1

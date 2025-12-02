@@ -4,8 +4,11 @@
 
 def produccion_producir(estado): # llamar al diccionario para la reconstruccion necesaria
     f=0
+    r=1
     if estado["Cantidad de empleados"]>4:
         f=estado["Cantidad de empleados"]-4
+    if estado["incentivos"]>0:
+        r=1.2
     d=estado["Prohibir Produccion"]==False and estado["r_producir"]==0
     q=estado["r_produccion"]==0 and estado["r_insumos"]==0
     if d and q and estado["p_ventas,produccion"]==0:
@@ -13,18 +16,18 @@ def produccion_producir(estado): # llamar al diccionario para la reconstruccion 
             if f>=1:
                 if estado["Insumos disponibles"] >= 40000* f * 0.9:
                     estado["Insumos disponibles"] -= 40000 * f * 0.9
-                    estado["Inventario"] += 2000
+                    estado["Inventario"] += 2000*r
                     estado["contador_actual"]["antes_insumos"] += 40000 * f * 0.9
-                    estado["contador_actual"]["antes_inventario"] +=2000
+                    estado["contador_actual"]["antes_inventario"] +=2000 * r
                 else:
                     break
 
             else:
                 if estado["Insumos disponibles"] >= 40000:
                     estado["Insumos disponibles"] -= 40000
-                    estado["Inventario"] += 2000
+                    estado["Inventario"] += 2000*r
                     estado["contador_actual"]["antes_insumos"] += 40000
-                    estado["contador_actual"]["antes_inventario"] += 2000
+                    estado["contador_actual"]["antes_inventario"] += 2000 * r
                 else:
                     break
 
@@ -56,11 +59,14 @@ def produccion_mantenimiento_maquinaria(estado):
     return estado
 
 def produccion_comprar_nueva_maquina(estado):
-    if estado["Caja disponible"]>10000:
-        estado["Caja disponible"]-=10000
-    elif estado["Caja disponible"]<=10000:
+    we=1
+    if estado["aumento_por 10%"]>5:
+        we=1.1
+    if estado["Caja disponible"]>10000*we:
+        estado["Caja disponible"]-=10000*we
+    elif estado["Caja disponible"]<=10000*we:
         estado["Caja disponible"] =0
-        estado["Deuda pendiente"]+=11200
+        estado["Deuda pendiente"]+=11200*we
     estado["Maquinas (total/activas/dañadas)"] = str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-3]) + 1) + "/" + str(int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2]) + 1) +"/"+ str(estado["Maquinas (total/activas/dañadas)"].split("/")[-1])
     return estado
 
@@ -76,20 +82,27 @@ def rh_contratar_personal_permanente(estado):
     return estado
 
 def rh_contratar_personal_temporal(estado):
-    if estado["Caja disponible"] > 10000:
-        estado["Caja disponible"] -= 10000
-    elif estado["Caja disponible"] <= 10000:
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] > 10000*we:
+        estado["Caja disponible"] -= 10000*we
+    elif estado["Caja disponible"] <= 10000*we:
         estado["Caja disponible"] = 0
-        estado["Deuda pendiente"] += 11200
+        estado["Deuda pendiente"] += 11200*we
     # falta los empleados temporales aumento de 4
     estado["Contador_empleadosTemp"]=1
     return estado
 
 def rh_implementar_incentivos(estado):
-    if estado["Caja disponible"] >= 5000:
-        estado["Caja disponible"] -= 5000
-    elif estado["Caja disponible"] < 5000:
-        estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+    if estado["Caja disponible"] >= 5000*we:
+        estado["Caja disponible"] -= 5000*we
+    elif estado["Caja disponible"] < 5000*we:
+        estado["Deuda pendiente"] += (5000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["IncentivosActivos"]=5
     """
@@ -113,7 +126,7 @@ def rh_subir_sueldos(estado):
         estado["Costo por empleado"]=estado["Costo por empleado"]*1.07
     elif estado["Subida de sueldo"]==2:
         estado["Costo por empleado"]=estado["Costo por empleado"]*1.04
-    elif estado["Subida de sueldo"]==1:
+    elif estado["Subida de sueldo"]>2:
         estado["Costo por empleado"]=estado["Costo por empleado"]*1.015
     estado["Subida de sueldo"] += 1 # aumentar cada que se haga
     return estado
@@ -125,10 +138,14 @@ def rh_no_hacer_nada(estado):
 # ---------------- Marketing ----------------
 
 def marketing_lanzar_campania(estado):
-    if estado["Caja disponible"] >= 8000:
-        estado["Caja disponible"] -= 8000
-    elif estado["Caja disponible"] < 8000:
-        estado["Deuda pendiente"] += (8000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 8000*we:
+        estado["Caja disponible"] -= 8000*we
+    elif estado["Caja disponible"] < 8000*we:
+        estado["Deuda pendiente"] += (8000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     if int(estado["Reputacion del mercado"].split()[-1])<7:
         estado["Reputacion del mercado"]="Nivel 7"
@@ -143,10 +160,14 @@ def marketing_lanzar_campania(estado):
     return estado
 
 def marketing_invertir_branding(estado):
-    if estado["Caja disponible"] >= 12000:
-        estado["Caja disponible"] -= 12000
-    elif estado["Caja disponible"] < 12000:
-        estado["Deuda pendiente"] += (12000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 12000*we:
+        estado["Caja disponible"] -= 12000*we
+    elif estado["Caja disponible"] < 12000*we:
+        estado["Deuda pendiente"] += (12000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     if int(estado["Reputacion del mercado"].split()[-1])<8:
         estado["reputacion anterior"] =int(estado["Reputacion del mercado"].split()[-1])
@@ -157,10 +178,14 @@ def marketing_invertir_branding(estado):
     return estado
 
 def marketing_estudio_mercado(estado):
-    if estado["Caja disponible"] >= 5000:
-        estado["Caja disponible"] -= 5000
-    elif estado["Caja disponible"] < 5000:
-        estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 5000*we:
+        estado["Caja disponible"] -= 5000*we
+    elif estado["Caja disponible"] < 5000*we:
+        estado["Deuda pendiente"] += (5000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["Reputacion del mercado"] = "Nivel "+ str(int(estado["Reputacion del mercado"].split()[-1])+2)
     estado["duracion_demanda"] = 5
@@ -169,19 +194,22 @@ def marketing_estudio_mercado(estado):
     return estado
 
 def marketing_abrir_ecommerce(estado):
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
     if estado["EcommerceActivo"] == False:
-        if estado["Caja disponible"] >= 20000:
+        if estado["Caja disponible"] >= 20000*we:
             estado["EcommerceActivo"] = True
-            estado["Caja disponible"] -= 20000
-        elif estado["Caja disponible"] < 20000:
-            estado["Deuda pendiente"] += (20000 - estado["Caja disponible"]) * 1.12
+            estado["Caja disponible"] -= 20000*we
+        elif estado["Caja disponible"] < 20000*we:
+            estado["Deuda pendiente"] += (20000*we - estado["Caja disponible"]) * 1.12
             estado["EcommerceActivo"] = True
             estado["Caja disponible"] = 0
     elif estado["EcommerceActivo"] == True:
-        if estado["Caja disponible"] >= 2000:
-            estado["Caja disponible"] -= 2000
-        elif estado["Caja disponible"] < 2000:
-            estado["Deuda pendiente"] += (2000 - estado["Caja disponible"]) * 1.12
+        if estado["Caja disponible"] >= 2000*we:
+            estado["Caja disponible"] -= 2000*we
+        elif estado["Caja disponible"] < 2000*we:
+            estado["Deuda pendiente"] += (2000*we - estado["Caja disponible"]) * 1.12
             estado["Caja disponible"] = 0
     estado["duracion_ecommerce"] = 3
     """
@@ -193,10 +221,14 @@ def marketing_abrir_ecommerce(estado):
     return estado
 
 def marketing_co_branding(estado):
-    if estado["Caja disponible"] >= 3000:
-        estado["Caja disponible"] -= 3000
-    elif estado["Caja disponible"] < 3000:
-        estado["Deuda pendiente"] += (3000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 3000*we:
+        estado["Caja disponible"] -= 3000*we
+    elif estado["Caja disponible"] < 3000*we:
+        estado["Deuda pendiente"] += (3000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["contador_co-branding"]=2
     estado["aumento_venta"]=20 #      (siempre y cuando exista inventario disponible para la venta).
@@ -212,6 +244,10 @@ def marketing_no_hacer_nada(estado):
 # ---------------- Compras ----------------
 
 def compras_comprar_insumos_nacionales(estado): # indice se desplaza en estado final
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
     if estado["p_compras-nacionales"]==0:
         if estado["CreditoConcedido"] == True:
             if estado["Activacion_descuento"] == True:
@@ -230,49 +266,57 @@ def compras_comprar_insumos_nacionales(estado): # indice se desplaza en estado f
             estado["Insumos disponibles"] += 500000
         else:
             if estado["Activacion_descuento"] == True:
-                if estado["Caja disponible"] >= 10000 * (1 - estado["Descuento_compra"]):
-                    estado["Caja disponible"] -= 10000 * (1 - estado["Descuento_compra"])
-                elif estado["Caja disponible"] < 10000 * (1 - estado["Descuento_compra"]):
-                    estado["Deuda pendiente"] += (10000 * (1 - estado["Descuento_compra"]) - estado[
+                if estado["Caja disponible"] >= 10000 * (1 - estado["Descuento_compra"])*we:
+                    estado["Caja disponible"] -= 10000 * (1 - estado["Descuento_compra"])*we
+                elif estado["Caja disponible"] < 10000 * (1 - estado["Descuento_compra"])*we:
+                    estado["Deuda pendiente"] += (10000*we * (1 - estado["Descuento_compra"]) - estado[
                         "Caja disponible"]) * 1.12
                     estado["Caja disponible"] = 0
                 estado["Insumos disponibles"] += 500000
             else:
-                if estado["Caja disponible"] >= 10000:
-                    estado["Caja disponible"] -= 10000
-                elif estado["Caja disponible"] < 10000:
-                    estado["Deuda pendiente"] += (10000 - estado["Caja disponible"]) * 1.12
+                if estado["Caja disponible"] >= 10000*we:
+                    estado["Caja disponible"] -= 10000*we
+                elif estado["Caja disponible"] < 10000*we:
+                    estado["Deuda pendiente"] += (10000*we - estado["Caja disponible"]) * 1.12
                     estado["Caja disponible"] = 0
                 estado["Insumos disponibles"] += 500000
 
     return estado
 
 def compras_comprar_insumos_importados(estado):
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
     if estado["Activacion_descuento"] == True:
         k = ['a', 'b', 'c', 'd']
         estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 14000
         estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
     else:
-        if estado["Caja disponible"] >= 14000:
-            estado["Caja disponible"] -= 14000
-        elif estado["Caja disponible"] < 14000:
-            estado["Deuda pendiente"] += (14000 - estado["Caja disponible"]) * 1.12
+        if estado["Caja disponible"] >= 14000*we:
+            estado["Caja disponible"] -= 14000*we
+        elif estado["Caja disponible"] < 14000*we:
+            estado["Deuda pendiente"] += (14000*we - estado["Caja disponible"]) * 1.12
             estado["Caja disponible"] = 0
 
     estado["Insumos disponibles"]+=800000
     return estado
 
 def compras_comprar_insumos_importados_premium(estado):
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
     if estado["p_insumosImportados"]!=0:
         if estado["Activacion_descuento"] == True:
             k = ['a', 'b', 'c', 'd']
             estado["Registro_de_deudas(cantidad)"][k[estado["indice_deudas"]]] += 25000
             estado["Registro_de_deudas(duracion)"][k[estado["indice_deudas"]]] = 3
         else:
-            if estado["Caja disponible"] >= 25000:
-                estado["Caja disponible"] -= 25000
-            elif estado["Caja disponible"] < 25000:
-                estado["Deuda pendiente"] += (25000 - estado["Caja disponible"]) * 1.12
+            if estado["Caja disponible"] >= 25000*we:
+                estado["Caja disponible"] -= 25000*we
+            elif estado["Caja disponible"] < 25000*we:
+                estado["Deuda pendiente"] += (25000*we - estado["Caja disponible"]) * 1.12
                 estado["Caja disponible"] = 0
 
         estado["Insumos disponibles"] += 900000
@@ -287,20 +331,28 @@ def compras_vender_excedentes_insumos(estado):
     return estado
 
 def compras_negociar_precio(estado):
-    if estado["Caja disponible"] >= 5000:
-        estado["Caja disponible"] -= 5000
-    elif estado["Caja disponible"] < 5000:
-        estado["Deuda pendiente"] += (5000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 5000*we:
+        estado["Caja disponible"] -= 5000*we
+    elif estado["Caja disponible"] < 5000*we:
+        estado["Deuda pendiente"] += (5000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["Activacion_descuento"]=True
     estado["Descuento_compra"]=0.7
     return estado
 
 def compras_negociar_credito(estado): # falta ajustar
-    if estado["Caja disponible"] >= 2000:
-        estado["Caja disponible"] -= 2000
-    elif estado["Caja disponible"] < 2000:
-        estado["Deuda pendiente"] += (2000 - estado["Caja disponible"]) * 1.12
+    we = 1
+    if estado["aumento_por 10%"] > 5:
+        we = 1.1
+
+    if estado["Caja disponible"] >= 2000*we:
+        estado["Caja disponible"] -= 2000*we
+    elif estado["Caja disponible"] < 2000*we:
+        estado["Deuda pendiente"] += (2000*we - estado["Caja disponible"]) * 1.12
         estado["Caja disponible"] = 0
     estado["CreditoConcedido"]=True
     return estado
@@ -312,6 +364,7 @@ def compras_no_hacer_nada(estado):
 # ---------------- Finanzas ----------------
 
 def finanzas_pagar_proveedores(estado): # no entiendo
+
     if estado["Caja disponible"]>=(sum(estado["Registro_de_deudas(cantidad)"].values())*0.95):
         estado["Caja disponible"]-=sum(estado["Registro_de_deudas(cantidad)"].values())*0.95
     else:

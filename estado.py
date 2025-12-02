@@ -54,6 +54,7 @@ def calcular_estado_inicial():
         "Registro_cambios37(tiempo)": {'a': 0, 'b': 0, 'c': 0}, # reiniciar pasado eso
         "Registro_cambios37": {'a': 0, 'b': 0, 'c': 0},
         "indice_deudas(cambios)": 0,
+        "aumento_por 10%":0,
 
         #
         "Registro_de_deudas(duracion)":{'a':0,'b':0,'c':0,'d':0}, # relacionado al credito de proveedores
@@ -253,7 +254,6 @@ def calcular_estado_final(estado):
          • Duracion de ‘MejoraProceso’, ‘BrandingActivo’, ‘MantenimientoHecho’, etc.
        - Desactivar (poner a False o 0) cualquier flag cuyo contador llegue a cero
     """
-#    if estado["Pedidos"]==0:
 
     """
     8) Perdida de inventario:

@@ -7,7 +7,8 @@ def produccion_producir(estado): # llamar al diccionario para la reconstruccion 
     if estado["Cantidad de empleados"]>4:
         f=estado["Cantidad de empleados"]-4
     d=estado["Prohibir Produccion"]==False and estado["r_producir"]==0
-    if d or estado["r_produccion"]==0:
+    q=estado["r_produccion"]==0 and estado["r_insumos"]==0
+    if d and q and estado["p_ventas,produccion"]==0:
         for a in range(1,int(estado["Maquinas (total/activas/dañadas)"].split("/")[-2])+1):
             if f>=1:
                 if estado["Insumos disponibles"] >= 40000* f * 0.9:

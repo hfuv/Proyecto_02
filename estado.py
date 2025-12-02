@@ -80,15 +80,33 @@ def calcular_estado_final(estado):
     #----------------------------------------------------------------------------------------
 
     #1-------------------
-    while estado["Inventario"]>0 :
-        if estado["Pedidos por atender"]>0:
-           estado["Pedidos por atender"]-=1
-           estado["Unidades vendidas"]+=1
-           estado["Caja disponible"] += estado["Precio Venta"]
-           estado["Ventas"]+=1
-        elif estado["Pedidos por atender"]==0:
-            break
-        estado["Inventario"] -= 1
+    if estado["R_ventas"]==0 and estado["p_venta"]==0 and estado["p_ventas,produccion"]==0:
+        r=(100-estado["carta34"]+estado["carta29"]+estado["carta 26"]+estado["R-12"])
+        if r <0:
+            r=0
+        if estado["descuento de venta"] == False:
+            while estado["Inventario"] > 0:
+                if estado["Pedidos por atender"] > 0:
+                    estado["Pedidos por atender"] -= 1
+                    estado["Unidades vendidas"] += 1
+                    estado["Caja disponible"] += estado["Precio Venta"]
+                    estado["Ventas"] += 1
+                elif estado["Pedidos por atender"] == 0:
+                    break
+                estado["Inventario"] -= 1
+        else:
+            qw = int(estado["Inventario"] * r/100)
+            if qw!=0:
+                estado["Inventario"] = qw
+                while qw > 0:
+                    if estado["Pedidos por atender"] > 0:
+                        estado["Pedidos por atender"] -= 1
+                        estado["Unidades vendidas"] += 1
+                        estado["Caja disponible"] += estado["Precio Venta"]
+                        estado["Ventas"] += 1
+                    elif estado["Pedidos por atender"] == 0:
+                        break
+                    qw -= 1
     if estado["registro de ventas_indice"]==0:
         estado["registro de ventas_precios"][estado["registro de ventas_indice"]]=estado["Ventas"]
         estado["registro de ventas_indice"]+=1
@@ -175,6 +193,20 @@ def calcular_estado_final(estado):
 # carta 4
     if estado["perdida"]==True:
        estado["Inventario"]=0
+# carta 13
+    if 0<estado["carta 13"]<=2:
+        if estado["Caja disponible"] >= 15000:
+            estado["Caja disponible"] -= 15000
+        else:
+            estado["Deuda pendiente"] += (15000 - estado["Caja disponible"]) * 1.12
+            estado["Caja disponible"] = 0
+        if estado["Caja disponible"] >= estado["registro de ventas_precios"]:
+            estado["Caja disponible"] -= sum(estado["registro de ventas_precios"])
+        else:
+            estado["Deuda pendiente"] += (sum(estado["registro de ventas_precios"]) - estado[
+                "Caja disponible"]) * 1.12
+            estado["Caja disponible"] = 0
+
     """""
        5) Anular multas, accidentes, y demas cartas del caos
        - Esto dependera de la carta del caos que haya salido, y de los flags que tengas activos.

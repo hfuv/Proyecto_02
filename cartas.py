@@ -89,7 +89,7 @@ def aplicar_carta(numero, estado):
 
     elif numero == 11:
         estado["Multas e indemnizaciones"] += 5000
-        if int(estado["Reputacion del mercado"][-1])>=1:
+        if int(estado["Reputacion del mercado"].split()[-1])>=1:
             estado["Reputacion del mercado"]="Nivel "+str(int(estado["Reputacion del mercado"][-1])-1)
         elif int(estado["Reputacion del mercado"][-1])<1:
             estado["Reputacion del mercado"]="Nivel "+str(0)
